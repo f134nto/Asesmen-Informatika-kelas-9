@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EduAssess Pro — Asesmen Informatika Kelas IX (9A–9K)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <title>EduAssess Pro — Asesmen Informatika Kelas IX (9A–9K) | MTs Ma'arif NU 1 Wangon</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js untuk Grafik Dashboard & Analisis Nilai -->
@@ -13,11 +13,12 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
-    body {
+    html, body {
       font-family: 'Inter', sans-serif;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     /* Custom scrollbar halus */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -25,20 +26,28 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+    /* Animasi pulsa halus */
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .pulse-gentle { animation: gentlePulse 2s infinite ease-in-out; }
+
     @media print {
       .no-print { display: none !important; }
-      body { background: white !important; }
+      body { background: white !important; color: black !important; }
       main { padding: 0 !important; margin: 0 !important; }
+      .print-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; page-break-inside: avoid; }
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden selection:bg-indigo-500 selection:text-white">
 
   <!-- ==================== SHELL UTAMA DASHBOARD GURU ==================== -->
   <div id="teacher-app" class="hidden min-h-screen flex flex-col lg:flex-row">
 
     <!-- Overlay Mobile Sidebar -->
-    <div id="sidebar-overlay" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden lg:hidden"></div>
 
     <!-- Sidebar Navigasi -->
     <aside id="sidebar" class="no-print fixed lg:sticky top-0 left-0 z-50 h-screen w-72 bg-slate-900 text-slate-100 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 shrink-0 shadow-2xl lg:shadow-none">
@@ -65,7 +74,7 @@
         </button>
         <button onclick="switchTab('kisi')" data-tab="kisi" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition">
           <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-          <span>Kisi-Kisi Soal</span>
+          <span>Kisi-Kisi Soal (45)</span>
         </button>
         <button onclick="switchTab('soal')" data-tab="soal" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition">
           <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -87,7 +96,7 @@
         </button>
       </nav>
 
-      <!-- Tombol Mode Ujian HP -->
+      <!-- Tombol Mode Ujian HP & Spreadsheet -->
       <div class="p-4 border-t border-slate-800 space-y-2.5">
         <button onclick="openSpreadsheetModal()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-semibold text-xs transition flex items-center justify-between gap-2">
           <span class="flex items-center gap-2">
@@ -109,14 +118,14 @@
     <!-- Area Konten Utama -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Topbar -->
-      <header class="no-print sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+      <header class="no-print sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3 shadow-xs">
         <div class="flex items-center gap-3 min-w-0">
           <button onclick="toggleMobileSidebar(true)" class="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
           <div class="truncate">
             <p id="topbar-title" class="font-bold text-slate-900 text-sm sm:text-base truncate">Dashboard Asesmen Informatika IX</p>
-            <p class="text-[11px] text-slate-500 hidden sm:block">MTs • Kurikulum Merdeka • 30 PG, 10 PGK (2 Jawaban), 5 Esai</p>
+            <p class="text-[11px] text-slate-500 hidden sm:block">MTs Ma'arif NU 1 Wangon • Kurikulum Merdeka • 45 Butir Soal</p>
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -124,12 +133,16 @@
             <span id="topbar-sync-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
             <span id="topbar-sync-label" class="hidden sm:inline">Spreadsheet: Lokal</span>
           </button>
-          <button onclick="openResetConfirmModal()" title="Reset ke data bawaan" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition">
+          <button onclick="openBackupRestoreModal()" title="Cadangkan atau pulihkan data" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            <span class="hidden md:inline">Cadangan</span>
+          </button>
+          <button onclick="openResetConfirmModal()" title="Reset ke data bawaan" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 text-xs font-semibold transition">
             Reset Data
           </button>
           <button onclick="openStudentExamMode()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-            <span class="hidden sm:inline">Login Siswa</span>
+            <span class="hidden sm:inline">Login Siswa (HP)</span>
           </button>
         </div>
       </header>
@@ -147,14 +160,14 @@
   </div>
 
   <!-- ==================== MODAL GLOBAL ==================== -->
-  <div id="global-modal" class="hidden fixed inset-0 z-[70] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div id="global-modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden">
+  <div id="global-modal" class="hidden fixed inset-0 z-[70] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div id="global-modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
       <!-- Konten modal dinamis -->
     </div>
   </div>
 
   <!-- ==================== TOAST NOTIFICATION ==================== -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-[80] flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[80] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-3 sm:px-0"></div>
 
   <script>
     /*************************************************************************
@@ -204,11 +217,8 @@
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569"/>
             </marker>
           </defs>
-          <!-- A <-> B (dua arah) -->
           <line x1="78" y1="45" x2="254" y2="45" stroke="#4f46e5" stroke-width="2.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
-          <!-- A -> C (satu arah) -->
           <line x1="65" y1="62" x2="152" y2="122" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
-          <!-- C -> B (satu arah) -->
           <line x1="186" y1="122" x2="266" y2="62" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
           <circle cx="55" cy="45" r="22" fill="#4f46e5"/><text x="55" y="49" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Kota A</text>
           <circle cx="280" cy="45" r="22" fill="#0ea5e9"/><text x="280" y="49" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Kota B</text>
@@ -224,13 +234,9 @@
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
             </marker>
           </defs>
-          <!-- P <-> Q (dua arah) -->
           <line x1="80" y1="40" x2="262" y2="40" stroke="#4f46e5" stroke-width="2.5" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
-          <!-- Q -> R (satu arah) -->
           <line x1="280" y1="62" x2="280" y2="115" stroke="#64748b" stroke-width="2" marker-end="url(#arrow2)"/>
-          <!-- P -> S (satu arah) -->
           <line x1="58" y1="62" x2="58" y2="115" stroke="#64748b" stroke-width="2" marker-end="url(#arrow2)"/>
-          <!-- S <-> R (dua arah) -->
           <line x1="82" y1="138" x2="258" y2="138" stroke="#10b981" stroke-width="2.5" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
           <circle cx="58" cy="40" r="20" fill="#4f46e5"/><text x="58" y="44" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Kota P</text>
           <circle cx="280" cy="40" r="20" fill="#0ea5e9"/><text x="280" y="44" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Kota Q</text>
@@ -240,7 +246,7 @@
       </div>`;
 
     const INITIAL_QUESTIONS = [
-      // ==================== NOMOR 1 - 30: PILIHAN GANDA (PG) ====================
+      // ==================== NOMOR 1 - 20: PILIHAN GANDA (PG) ====================
       {
         no: 1, type: 'PG', level: 'C2',
         cp: 'Memahami dampak sosial informatika dan nilai Pancasila',
@@ -892,7 +898,7 @@
     ];
 
     /*************************************************************************
-     * 2. DATA KELAS (9A–9K), SISWA AWAL & GENERATOR SIMULASI JAWABAN REALISTIS
+     * 2. DATA KELAS (9A–9K), SISWA AWAL & SIMULASI PENGERJAAN
      *************************************************************************/
     const CLASSES = ['9A', '9B', '9C', '9D', '9E', '9F', '9G', '9H', '9I', '9J', '9K'];
 
@@ -956,7 +962,7 @@
             }
           } else if (q.type === 'ESSAY') {
             const sc = isCorrect ? 4 : (seedVal < ability + 0.12 ? 3 : 2);
-            answers[q.no] = sc === 4 ? q.sampleAnswer : 'Jawaban sebagian sesuai konsep ' + q.materi + '.';
+            answers[q.no] = sc === 4 ? q.sampleAnswer : 'Jawaban konsep ' + q.materi + ' sesuai buku informatika.';
             essayScores[q.no] = sc;
             essayTotal += sc;
           }
@@ -982,14 +988,24 @@
     }
 
     /*************************************************************************
-     * 3. STATE MANAGEMENT & HELPER UTILITIES
+     * 3. STATE MANAGEMENT, PENGATURAN (KKTP), LOCALSTORAGE & AUTO-SAVE
      *************************************************************************/
     const STORAGE_KEY = 'eduassess_asas_informatika_ix_v3';
+    const SETTINGS_KEY = 'eduassess_settings_v3';
     const SHEET_URL_KEY = 'eduassess_sheet_webapp_url_v1';
+    const EXAM_SESSION_KEY = 'eduassess_active_exam_session_v3';
     const APPS_SCRIPT_PROJECT_URL = 'https://script.google.com/u/0/home/projects/1cjqoHU7p9kBhczYTB6KGgzatV5gZiUusZ_mCeck-nE67gSj9BN3FFAWx/edit';
     const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzetYoZvi9RRBpaZwArBqBEmuYKu0x9xPIwZS4TESX2M6fSJQ-UfDTJwSdvWikGuGfX/exec';
-    const KKTP = 75;
     const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
+    const MAX_ATTEMPTS = 2;
+
+    let appSettings = {
+      kktp: 75,
+      diffEasy: 75,
+      diffHard: 45,
+      teacherPin: 'F134nto',
+      customRecommendations: {}
+    };
 
     let cloudState = {
       url: '',
@@ -1010,7 +1026,10 @@
       showAnswerKey: true,
       siswaSearch: '',
       siswaKelasFilter: 'ALL',
+      selectedStudentIds: new Set(),
       nilaiKelasFilter: 'ALL',
+      nilaiSearch: '',
+      selectedSubmissionIds: new Set(),
       analisisKelasFilter: 'ALL',
       questions: [],
       students: [],
@@ -1027,25 +1046,203 @@
         .replace(/'/g, '&#039;');
     }
 
+    function loadSettings() {
+      try {
+        const saved = localStorage.getItem(SETTINGS_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          appSettings = { ...appSettings, ...parsed };
+        }
+      } catch (e) {
+        console.warn('Gagal memuat pengaturan:', e);
+      }
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
+      } catch (e) {
+        console.warn('Gagal menyimpan pengaturan:', e);
+      }
+    }
+
+    function loadState() {
+      loadSettings();
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed.questions) && parsed.questions.length === 45) {
+            appState.questions = parsed.questions;
+            appState.students = Array.isArray(parsed.students) ? parsed.students : JSON.parse(JSON.stringify(INITIAL_STUDENTS));
+            appState.submissions = Array.isArray(parsed.submissions) ? parsed.submissions : [];
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal membaca localStorage, memakai data awal:', err);
+      }
+      appState.questions = JSON.parse(JSON.stringify(INITIAL_QUESTIONS));
+      appState.students = JSON.parse(JSON.stringify(INITIAL_STUDENTS));
+      appState.submissions = createInitialSubmissions(appState.students, appState.questions);
+      saveState();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          questions: appState.questions,
+          students: appState.students,
+          submissions: appState.submissions
+        }));
+      } catch (err) {
+        console.warn('Gagal menyimpan ke localStorage:', err);
+      }
+    }
+
+    /*************************************************************************
+     * ENGINE HITUNG ULANG NILAI (RECALCULATE ALL SUBMISSIONS)
+     * Otomatis dipanggil saat Kunci Jawaban diubah guru di Bank Soal / Analisis
+     *************************************************************************/
+    function calculateSubmissionScore(sub, questions) {
+      let pg = 0, pgk = 0, essay = 0;
+      const qMap = {};
+      questions.forEach(q => qMap[q.no] = q);
+
+      questions.forEach(q => {
+        if (q.type === 'PG') {
+          if (sub.answers && sub.answers[q.no] === q.answer) pg += 2;
+        } else if (q.type === 'PGK') {
+          const ans = (sub.answers && Array.isArray(sub.answers[q.no])) ? sub.answers[q.no] : [];
+          const correctCount = ans.filter(a => q.answers.includes(a)).length;
+          const wrongCount = ans.filter(a => !q.answers.includes(a)).length;
+          if (correctCount === 2 && wrongCount === 0) pgk += 2;
+          else if (correctCount === 1 && ans.length <= 2) pgk += 1;
+        } else if (q.type === 'ESSAY') {
+          if (sub.essayScores && typeof sub.essayScores[q.no] === 'number') {
+            essay += sub.essayScores[q.no];
+          } else {
+            const txt = String(sub.answers?.[q.no] || '').trim();
+            const sc = txt.length >= 45 ? 4 : txt.length >= 20 ? 3 : txt.length >= 5 ? 2 : 0;
+            if (!sub.essayScores) sub.essayScores = {};
+            sub.essayScores[q.no] = sc;
+            essay += sc;
+          }
+        }
+      });
+
+      sub.pgScore = pg;
+      sub.pgkScore = pgk;
+      sub.essayScore = essay;
+      sub.totalScore = pg + pgk + essay;
+      return sub;
+    }
+
+    function recalculateAllSubmissions(silent = false) {
+      appState.submissions.forEach(sub => calculateSubmissionScore(sub, appState.questions));
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      if (!silent) showToast('Seluruh nilai siswa berhasil dihitung ulang sesuai kunci jawaban terbaru!');
+    }
+
+    /*************************************************************************
+     * FITUR CADANGAN (BACKUP) & RESTORASI DATABASE LENGKAP
+     *************************************************************************/
+    function openBackupRestoreModal() {
+      openModal(`
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Cadangan & Restorasi Database</h3>
+            <p class="text-xs text-slate-500">Simpan atau pulihkan seluruh data: Siswa, Nilai, Soal, dan Pengaturan</p>
+          </div>
+          <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+        </div>
+        <div class="p-5 space-y-4 overflow-y-auto">
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 space-y-2">
+            <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wider">1. Unduh File Cadangan (Backup JSON)</h4>
+            <p class="text-xs text-indigo-700">Simpan seluruh data asesmen saat ini ke berkas JSON di HP atau laptop Anda sebagai cadangan keamanan data.</p>
+            <button onclick="exportDatabaseJSON()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              Unduh File Cadangan (JSON)
+            </button>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-2">
+            <h4 class="text-xs font-bold text-emerald-900 uppercase tracking-wider">2. Pulihkan Data dari Cadangan (Restore JSON)</h4>
+            <p class="text-xs text-emerald-700">Pilih file cadangan JSON yang pernah Anda unduh sebelumnya untuk memulihkan seluruh data secara instan.</p>
+            <input type="file" id="restore-file-input" accept=".json" onchange="importDatabaseJSON(event)" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 border border-emerald-200 rounded-xl p-1 bg-white">
+          </div>
+
+          <div class="flex justify-end pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Tutup</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function exportDatabaseJSON() {
+      const dump = {
+        app: 'EduAssess Pro',
+        version: '3.0',
+        exportedAt: new Date().toISOString(),
+        settings: appSettings,
+        questions: appState.questions,
+        students: appState.students,
+        submissions: appState.submissions
+      };
+      const json = JSON.stringify(dump, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `EduAssess_Backup_Informatika_IX_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('File cadangan database berhasil diunduh!');
+    }
+
+    function importDatabaseJSON(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (!Array.isArray(parsed.questions) || !Array.isArray(parsed.students)) {
+            throw new Error('Format file cadangan tidak valid.');
+          }
+          appState.questions = parsed.questions;
+          appState.students = parsed.students;
+          appState.submissions = Array.isArray(parsed.submissions) ? parsed.submissions : [];
+          if (parsed.settings) appSettings = { ...appSettings, ...parsed.settings };
+          saveSettings();
+          saveState();
+          cloudPost({ action: 'saveAll', students: appState.students, submissions: appState.submissions, questions: appState.questions }, true);
+          closeModal();
+          switchTab(appState.activeTab);
+          showToast('Database berhasil dipulihkan dari file cadangan!');
+        } catch (err) {
+          showToast('Gagal memulihkan: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+    /*************************************************************************
+     * 4. KODE GOOGLE APPS SCRIPT LENGKAP & SINKRONISASI SPREADSHEET
+     *************************************************************************/
     const APPS_SCRIPT_CODE = `// =========================================================================
 // KODE GOOGLE APPS SCRIPT — ASESMEN INFORMATIKA KELAS IX (9A–9K)
-// Otomatis membuat & memperbarui sheet:
+// Otomatis membentuk & menyinkronkan:
 // 1. Rekap_Per_Kelas (Ringkasan semua kelas 9A–9K)
 // 2. Nilai_9A s.d. Nilai_9K (Daftar nilai tiap kelas sendiri-sendiri)
 // 3. Analisis_9A s.d. Analisis_9K (Statistik & analisis 45 butir soal tiap kelas)
-// 4. Data_Siswa, Nilai_Ujian, Bank_Soal (Database utama sinkronisasi aplikasi)
-//
-// Cara pasang:
-// 1. Tempel kode ini di proyek Apps Script Anda, lalu klik Simpan (Ctrl+S).
-// 2. Klik Run sekali pada fungsi testSetup dan izinkan akses Spreadsheet.
-// 3. Klik Terapkan (Deploy) -> Kelola deployment -> Edit -> Versi baru -> Terapkan.
-// 4. Pastikan "Jalankan sebagai: Saya" & "Yang memiliki akses: Siapa saja".
+// 4. Data_Siswa, Nilai_Ujian, Bank_Soal (Database sinkronisasi aplikasi)
 // =========================================================================
 
 var LIST_CLASSES = ['9A', '9B', '9C', '9D', '9E', '9F', '9G', '9H', '9I', '9J', '9K'];
 var KKTP_SCORE = 75;
-// Opsional: isi ID Spreadsheet Anda (di antara /d/ dan /edit pada URL Sheet).
-// Jika kosong, otomatis memakai Spreadsheet aktif atau membuat file Spreadsheet baru.
 var SPREADSHEET_ID = '';
 
 function getTargetSpreadsheet() {
@@ -1474,7 +1671,7 @@ function doPost(e) {
       ok: true,
       spreadsheetName: ss.getName(),
       spreadsheetUrl: ss.getUrl(),
-      message: 'Nilai & Analisis tiap kelas (9A–9K) berhasil disinkronkan ke Spreadsheet!'
+      message: 'Nilai & Analisis berhasil disinkronkan ke Spreadsheet!'
     });
   } catch (err) {
     return jsonResponse({ ok: false, error: err.message });
@@ -1543,7 +1740,7 @@ function doPost(e) {
         const text = await res.text();
         let data = null;
         try { data = JSON.parse(text); } catch (parseErr) {
-          throw new Error('Apps Script mengembalikan HTML (belum Deploy ulang dengan akses "Siapa saja").');
+          throw new Error('Apps Script mengembalikan respon non-JSON. Pastikan sudah Deploy sebagai Aplikasi Web dengan akses "Siapa saja".');
         }
         if (data && data.ok) {
           cloudState.status = 'connected';
@@ -1556,7 +1753,6 @@ function doPost(e) {
         }
         throw new Error(data?.error || 'Respon server tidak valid');
       } catch (err) {
-        // Fallback mode no-cors jika browser memblokir baca respon redirect Apps Script
         if (err instanceof TypeError) {
           try {
             await fetch(cloudState.url, {
@@ -1569,7 +1765,7 @@ function doPost(e) {
             cloudState.status = 'connected';
             cloudState.lastSync = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             updateCloudStatusUI();
-            if (!silent) showToast('Data dikirim ke Google Spreadsheet! Periksa tab sheet Anda.', 'info');
+            if (!silent) showToast('Data dikirim ke Google Spreadsheet!', 'info');
             return { ok: true, opaque: true };
           } catch (e2) {}
         }
@@ -1595,28 +1791,22 @@ function doPost(e) {
         const text = await res.text();
         let data = null;
         try { data = JSON.parse(text); } catch (e) {
-          throw new Error('Respon bukan JSON. Pastikan Apps Script sudah di-Deploy ulang sebagai Aplikasi Web (Siapa saja).');
+          throw new Error('Respon bukan JSON. Pastikan Apps Script di-Deploy sebagai Aplikasi Web (Siapa saja).');
         }
         if (!data || !data.ok) throw new Error(data?.error || 'Gagal memuat data Spreadsheet');
 
         if (data.spreadsheetName) cloudState.spreadsheetName = data.spreadsheetName;
         if (data.spreadsheetUrl) cloudState.spreadsheetUrl = data.spreadsheetUrl;
 
-        if (Array.isArray(data.students) && data.students.length > 0) {
-          appState.students = data.students;
-        }
-        if (Array.isArray(data.submissions) && data.submissions.length > 0) {
-          appState.submissions = data.submissions;
-        }
-        if (Array.isArray(data.questions) && data.questions.length === 45) {
-          appState.questions = data.questions;
-        }
+        if (Array.isArray(data.students) && data.students.length > 0) appState.students = data.students;
+        if (Array.isArray(data.submissions) && data.submissions.length > 0) appState.submissions = data.submissions;
+        if (Array.isArray(data.questions) && data.questions.length === 45) appState.questions = data.questions;
+
         saveState();
         cloudState.status = 'connected';
         cloudState.lastSync = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         updateCloudStatusUI();
 
-        // Refresh tampilan aktif
         if (!document.getElementById('teacher-app').classList.contains('hidden')) {
           switchTab(appState.activeTab);
         } else if (examState.phase === 'login') {
@@ -1651,7 +1841,7 @@ function doPost(e) {
         document.execCommand('copy');
         showToast('Kode Google Apps Script berhasil disalin!');
       } catch (err) {
-        showToast('Silakan blok dan salin kode secara manual.', 'warning');
+        showToast('Silakan salin kode secara manual.', 'warning');
       }
     }
 
@@ -1660,16 +1850,15 @@ function doPost(e) {
       openModal(`
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-bold text-slate-900">Sinkronisasi Google Spreadsheet (Per Kelas 9A–9K)</h3>
+            <h3 class="text-lg font-bold text-slate-900">Sinkronisasi Google Spreadsheet (9A–9K)</h3>
             <p class="text-xs text-slate-500">Otomatis membentuk sheet Rekap_Per_Kelas, Nilai_9A–9K, dan Analisis_9A–9K</p>
           </div>
           <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
         </div>
         <div class="p-5 space-y-4 overflow-y-auto">
-          <!-- Status -->
           <div class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${isConnected ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}">
             <div class="text-xs min-w-0">
-              <p class="font-bold">${isConnected ? (cloudState.spreadsheetName ? 'Terhubung: ' + escapeHtml(cloudState.spreadsheetName) : 'Terhubung ke Google Spreadsheet') : 'Menunggu URL Deployment Aplikasi Web (/exec)'}</p>
+              <p class="font-bold">${isConnected ? (cloudState.spreadsheetName ? 'Terhubung: ' + escapeHtml(cloudState.spreadsheetName) : 'Terhubung ke Google Spreadsheet') : 'Menunggu URL Deployment Web App (/exec)'}</p>
               <p class="mt-0.5 opacity-80">${cloudState.lastError ? 'Info: ' + escapeHtml(cloudState.lastError) : (isConnected ? (cloudState.lastSync ? 'Terakhir sinkron: ' + cloudState.lastSync : 'Siap sinkronisasi Nilai & Analisis per kelas 9A–9K') : 'Buka proyek Apps Script Anda, tempel kode di bawah, lalu Deploy sebagai Aplikasi Web.')}</p>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
@@ -1678,9 +1867,8 @@ function doPost(e) {
             </div>
           </div>
 
-          <!-- Input URL -->
           <div class="space-y-2">
-            <label class="block text-xs font-bold text-slate-700">URL Web App Google Apps Script (harus berakhiran <code class="px-1 py-0.5 bg-slate-100 rounded">/exec</code>)</label>
+            <label class="block text-xs font-bold text-slate-700">URL Web App Google Apps Script (berakhiran <code class="px-1 py-0.5 bg-slate-100 rounded">/exec</code>)</label>
             <input type="url" id="sheet-url-input" value="${escapeHtml(cloudState.url)}" placeholder="https://script.google.com/macros/s/AKfycb.../exec" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
             <div class="flex flex-wrap gap-2 pt-1">
               <button type="button" onclick="saveAndTestSheetUrl()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">Simpan & Uji Koneksi</button>
@@ -1690,26 +1878,22 @@ function doPost(e) {
             </div>
           </div>
 
-          <!-- Panduan Pemasangan ke Proyek Apps Script User -->
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <p class="text-xs font-extrabold text-slate-800">Langkah Hubungkan Proyek Apps Script Anda:</p>
+              <p class="text-xs font-extrabold text-slate-800">Langkah Hubungkan Proyek Apps Script:</p>
               <div class="flex gap-1.5">
                 <a href="${APPS_SCRIPT_PROJECT_URL}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition">Buka Apps Script Anda ↗</a>
                 <button type="button" onclick="copyAppsScriptCode()" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold transition">Salin Kode Script</button>
               </div>
             </div>
             <ol class="list-decimal list-inside text-xs text-slate-600 space-y-1 leading-relaxed">
-              <li>Klik <strong>Salin Kode Script</strong>, lalu klik <strong>Buka Apps Script Anda</strong>.</li>
-              <li>Hapus seluruh kode lama di editor, tempel kode baru ini, lalu tekan <strong>Simpan (Ctrl+S)</strong>.</li>
+              <li>Klik <strong>Salin Kode Script</strong>, lalu buka proyek Apps Script Anda.</li>
+              <li>Ganti kode lama dengan kode baru ini, lalu tekan <strong>Simpan (Ctrl+S)</strong>.</li>
               <li>Klik <strong>Terapkan (Deploy) &rarr; Deployment baru</strong>, pilih jenis <strong>Aplikasi Web</strong>.</li>
               <li>Atur <em>Jalankan sebagai:</em> <strong>Saya</strong>, dan <em>Yang memiliki akses:</em> <strong>Siapa saja</strong>, lalu klik <strong>Terapkan</strong>.</li>
-              <li>Salin <strong>URL Aplikasi Web</strong> (berakhiran <code>/exec</code>, bukan <code>/edit</code>), tempel ke kolom di atas, lalu klik <strong>Simpan &amp; Uji Koneksi</strong> &rarr; <strong>Kirim Nilai &amp; Analisis 9A–9K</strong>.</li>
+              <li>Salin <strong>URL Aplikasi Web</strong> (berakhiran <code>/exec</code>), tempel di atas, lalu klik <strong>Simpan &amp; Uji Koneksi</strong>.</li>
             </ol>
-            <p class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 font-medium">
-              Hasil di Spreadsheet otomatis rapi per kelas: <strong>Rekap_Per_Kelas</strong>, <strong>Nilai_9A</strong> s.d. <strong>Nilai_9K</strong>, dan <strong>Analisis_9A</strong> s.d. <strong>Analisis_9K</strong>.
-            </p>
-            <textarea id="apps-script-textarea" readonly rows="6" class="w-full p-3 rounded-xl bg-slate-900 text-emerald-300 font-mono text-[11px] leading-relaxed border border-slate-700 focus:outline-none">${escapeHtml(APPS_SCRIPT_CODE)}</textarea>
+            <textarea id="apps-script-textarea" readonly rows="5" class="w-full p-3 rounded-xl bg-slate-900 text-emerald-300 font-mono text-[11px] leading-relaxed border border-slate-700 focus:outline-none">${escapeHtml(APPS_SCRIPT_CODE)}</textarea>
           </div>
         </div>
       `);
@@ -1722,7 +1906,7 @@ function doPost(e) {
         return;
       }
       if (url.includes('/edit') || url.includes('/home/projects/')) {
-        showToast('Itu URL Editor (/edit). Klik Terapkan -> Aplikasi Web di Apps Script lalu salin URL yang berakhiran /exec!', 'warning');
+        showToast('Itu URL Editor (/edit). Buka Terapkan -> Aplikasi Web lalu salin URL berakhiran /exec!', 'warning');
         return;
       }
       cloudState.url = url;
@@ -1775,47 +1959,14 @@ function doPost(e) {
       return CLASSES.includes(s) ? s : '9A';
     }
 
-    function loadState() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed.questions) && parsed.questions.length === 45) {
-            appState.questions = parsed.questions;
-            appState.students = Array.isArray(parsed.students) ? parsed.students : JSON.parse(JSON.stringify(INITIAL_STUDENTS));
-            appState.submissions = Array.isArray(parsed.submissions) ? parsed.submissions : [];
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn('Gagal membaca localStorage, memakai data awal:', err);
-      }
-      appState.questions = JSON.parse(JSON.stringify(INITIAL_QUESTIONS));
-      appState.students = JSON.parse(JSON.stringify(INITIAL_STUDENTS));
-      appState.submissions = createInitialSubmissions(appState.students, appState.questions);
-      saveState();
-    }
-
-    function saveState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          questions: appState.questions,
-          students: appState.students,
-          submissions: appState.submissions
-        }));
-      } catch (err) {
-        console.warn('Gagal menyimpan ke localStorage:', err);
-      }
-    }
-
     function openResetConfirmModal() {
       openModal(`
         <div class="p-6 text-center space-y-4">
           <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900">Reset Semua Data ke Awal?</h3>
-          <p class="text-sm text-slate-600">Seluruh perubahan soal, data siswa impor, dan nilai ujian akan dikembalikan ke data bawaan aplikasi.</p>
+          <h3 class="text-lg font-bold text-slate-900">Reset Semua Data ke Kondisi Awal?</h3>
+          <p class="text-sm text-slate-600">Seluruh perubahan soal, siswa yang diimpor, dan nilai ujian akan dikembalikan ke data awal bawaan.</p>
           <div class="flex gap-3 pt-2">
             <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
             <button onclick="resetAppData()" class="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold">Ya, Reset Data</button>
@@ -1848,7 +1999,7 @@ function doPost(e) {
         el.style.opacity = '0';
         el.style.transform = 'translateY(8px)';
         setTimeout(() => el.remove(), 300);
-      }, 3000);
+      }, 3200);
     }
 
     function openModal(html) {
@@ -1898,7 +2049,7 @@ function doPost(e) {
     function renderClassTabs(activeValue, onSelectFnName, countMap = null, includeAll = true) {
       const items = includeAll ? ['ALL', ...CLASSES] : [...CLASSES];
       return `
-        <div class="no-print bg-white p-2.5 rounded-2xl border border-slate-200/80 shadow-sm mb-5">
+        <div class="no-print bg-white p-2.5 rounded-2xl border border-slate-200/80 shadow-xs mb-5">
           <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2 shrink-0">Kelas:</span>
             ${items.map(cls => {
@@ -1908,7 +2059,7 @@ function doPost(e) {
               return `
                 <button onclick="${onSelectFnName}('${cls}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-indigo-600 text-white shadow-xs'
                     : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/70'
                 }">
                   <span>${label}</span>
@@ -1922,7 +2073,7 @@ function doPost(e) {
     }
 
     /*************************************************************************
-     * 4. NAVIGASI TAB UTAMA
+     * 5. NAVIGASI TAB UTAMA GURU
      *************************************************************************/
     const TAB_TITLES = {
       dashboard: 'Dashboard Asesmen Informatika IX',
@@ -1958,7 +2109,7 @@ function doPost(e) {
     }
 
     /*************************************************************************
-     * 5. VIEW 1: DASHBOARD PROFESIONAL (SEMUA KELAS & TIAP KELAS 9A-9K)
+     * 6. VIEW 1: DASHBOARD
      *************************************************************************/
     function setDashboardKelas(cls) {
       appState.dashboardKelasFilter = cls;
@@ -1977,14 +2128,14 @@ function doPost(e) {
       const totalSiswa = studentsInScope.length;
       const sudahUjian = subs.length;
       const avgScore = sudahUjian ? (subs.reduce((a, b) => a + b.totalScore, 0) / sudahUjian).toFixed(1) : '0.0';
-      const tuntasCount = subs.filter(s => s.totalScore >= KKTP).length;
+      const tuntasCount = subs.filter(s => s.totalScore >= appSettings.kktp).length;
       const tuntasPct = sudahUjian ? Math.round((tuntasCount / sudahUjian) * 100) : 0;
 
       const classSummary = CLASSES.map(cls => {
         const clsStudents = appState.students.filter(s => s.kelas === cls);
         const clsSubs = appState.submissions.filter(s => s.kelas === cls);
         const avg = clsSubs.length ? (clsSubs.reduce((a, b) => a + b.totalScore, 0) / clsSubs.length).toFixed(1) : '-';
-        const tuntas = clsSubs.filter(s => s.totalScore >= KKTP).length;
+        const tuntas = clsSubs.filter(s => s.totalScore >= appSettings.kktp).length;
         const pct = clsSubs.length ? Math.round((tuntas / clsSubs.length) * 100) : 0;
         return { cls, total: clsStudents.length, done: clsSubs.length, avg, tuntas, pct };
       });
@@ -1996,11 +2147,11 @@ function doPost(e) {
             <div>
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-semibold mb-3">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Kurikulum Merdeka • Kelas 9A–9K • TA 2026/2027
+                Kurikulum Merdeka • Kelas 9A–9K • MTs Ma'arif NU 1 Wangon
               </div>
               <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Asesmen Informatika ${activeKelas === 'ALL' ? 'Kelas 9A–9K' : 'Kelas ' + activeKelas}</h2>
               <p class="text-indigo-100 text-sm sm:text-base mt-1.5 max-w-2xl">
-                Generator soal berbasis kisi-kisi (30 PG, 10 PGK 2 Jawaban, 5 Esai), ujian mobile ramah HP, serta nilai & analisis tiap kelas.
+                Penilaian ramah HP siswa (30 PG, 10 PGK, 5 Esai), dilengkapi fitur kelola & perbaikan lengkap (Edit, Hapus, Hitung Ulang).
               </p>
             </div>
             <div class="flex flex-wrap gap-3 shrink-0">
@@ -2008,8 +2159,8 @@ function doPost(e) {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                 Mulai Ujian HP
               </button>
-              <button onclick="switchTab('soal')" class="px-5 py-3 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white font-semibold text-sm border border-white/20 transition">
-                Kelola 45 Soal
+              <button onclick="switchTab('nilai')" class="px-5 py-3 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white font-semibold text-sm border border-white/20 transition">
+                Buka Daftar Nilai
               </button>
             </div>
           </div>
@@ -2021,7 +2172,7 @@ function doPost(e) {
 
         <!-- KPI Stat Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Bank Soal</span>
               <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">45</div>
@@ -2034,7 +2185,7 @@ function doPost(e) {
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Partisipasi ${activeKelas === 'ALL' ? '9A–9K' : activeKelas}</span>
               <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">${totalSiswa ? Math.round((sudahUjian/totalSiswa)*100) : 0}%</div>
@@ -2045,16 +2196,16 @@ function doPost(e) {
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata ${activeKelas === 'ALL' ? 'Semua' : activeKelas}</span>
               <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">Ø</div>
             </div>
             <p class="text-3xl font-extrabold text-slate-900 mt-3">${avgScore} <span class="text-sm font-medium text-slate-400">/ 100</span></p>
-            <p class="text-xs text-slate-500 mt-2">KKTP Madrasah: <span class="font-semibold text-slate-700">${KKTP}</span></p>
+            <p class="text-xs text-slate-500 mt-2">KKTP Madrasah: <span class="font-semibold text-indigo-700">${appSettings.kktp}</span></p>
           </div>
 
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Ketuntasan ${activeKelas === 'ALL' ? 'Semua' : activeKelas}</span>
               <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">✓</div>
@@ -2065,10 +2216,10 @@ function doPost(e) {
         </div>
 
         <!-- Ringkasan Tiap Kelas 9A–9K -->
-        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm mb-6">
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs mb-6">
           <div class="mb-4">
             <h3 class="text-base font-bold text-slate-900">Rekap Performa Tiap Kelas (9A–9K)</h3>
-            <p class="text-xs text-slate-500">Klik kartu kelas untuk memfilter dashboard, nilai, dan analisis kelas tersebut</p>
+            <p class="text-xs text-slate-500">Pilih kartu kelas untuk memfilter dashboard, data nilai, dan analisis</p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             ${classSummary.map(c => `
@@ -2088,82 +2239,34 @@ function doPost(e) {
 
         <!-- Grafik -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div class="lg:col-span-2 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
+          <div class="lg:col-span-2 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs">
             <div class="flex items-center justify-between mb-4">
               <div>
                 <h3 class="text-base font-bold text-slate-900">Distribusi Nilai ${activeKelas === 'ALL' ? 'Semua Kelas' : 'Kelas ' + activeKelas}</h3>
                 <p class="text-xs text-slate-500">Sebaran nilai akhir siswa berdasarkan rentang predikat</p>
               </div>
-              <button onclick="if('${activeKelas}'!=='ALL') appState.analisisKelasFilter='${activeKelas}'; switchTab('analisis')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Analisis &rarr;</button>
+              <button onclick="if('${activeKelas}'!=='ALL') appState.analisisKelasFilter='${activeKelas}'; switchTab('analisis')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Buka Analisis &rarr;</button>
             </div>
             <div class="h-64">
               <canvas id="chart-dashboard-dist"></canvas>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
-            <h3 class="text-base font-bold text-slate-900">Sebaran Level Kognitif</h3>
-            <p class="text-xs text-slate-500 mb-4">Komposisi Taksonomi Bloom (C1–C4) pada 45 soal</p>
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs">
+            <h3 class="text-base font-bold text-slate-900">Komposisi Taksonomi Bloom</h3>
+            <p class="text-xs text-slate-500 mb-4">Sebaran Level C1–C4 pada 45 butir soal</p>
             <div class="h-64 flex items-center justify-center">
               <canvas id="chart-dashboard-bloom"></canvas>
             </div>
           </div>
         </div>
-
-        <!-- Tabel Hasil Terbaru -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-          <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Hasil Pengerjaan ${activeKelas === 'ALL' ? 'Terbaru (9A–9K)' : 'Kelas ' + activeKelas}</h3>
-              <p class="text-xs text-slate-500">Rekap otomatis dari pengerjaan ujian berbasis HP</p>
-            </div>
-            <button onclick="if('${activeKelas}'!=='ALL') appState.nilaiKelasFilter='${activeKelas}'; switchTab('nilai')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
-              Buka Daftar Nilai ${activeKelas === 'ALL' ? '' : activeKelas}
-            </button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
-                <tr>
-                  <th class="px-5 py-3.5 font-semibold">Nama Siswa</th>
-                  <th class="px-5 py-3.5 font-semibold">Kelas</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">PG (60)</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">PGK (20)</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">Esai (20)</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">Nilai Akhir</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                ${subs.length === 0 ? `
-                  <tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada hasil ujian untuk ${activeKelas === 'ALL' ? 'kelas mana pun' : 'kelas ' + activeKelas}.</td></tr>
-                ` : subs.slice(0, 8).map(s => `
-                  <tr class="hover:bg-slate-50/80 transition">
-                    <td class="px-5 py-3.5 font-semibold text-slate-900">${escapeHtml(s.studentName)}</td>
-                    <td class="px-5 py-3.5 text-slate-600 font-semibold">${escapeHtml(s.kelas)}</td>
-                    <td class="px-5 py-3.5 text-center">${s.pgScore}</td>
-                    <td class="px-5 py-3.5 text-center">${s.pgkScore}</td>
-                    <td class="px-5 py-3.5 text-center">${s.essayScore}</td>
-                    <td class="px-5 py-3.5 text-center font-bold text-indigo-700">${s.totalScore}</td>
-                    <td class="px-5 py-3.5 text-center">
-                      <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.totalScore >= KKTP ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
-                        ${s.totalScore >= KKTP ? 'Tuntas' : 'Remedial'}
-                      </span>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
       `;
 
-      // Render Chart.js
       try {
         if (typeof Chart !== 'undefined') {
           const buckets = [0, 0, 0, 0];
           subs.forEach(s => {
-            if (s.totalScore < 75) buckets[0]++;
+            if (s.totalScore < appSettings.kktp) buckets[0]++;
             else if (s.totalScore < 80) buckets[1]++;
             else if (s.totalScore < 90) buckets[2]++;
             else buckets[3]++;
@@ -2172,7 +2275,7 @@ function doPost(e) {
           appState.charts.dashDist = new Chart(document.getElementById('chart-dashboard-dist'), {
             type: 'bar',
             data: {
-              labels: ['< 75 (Remedial)', '75–79 (Cukup)', '80–89 (Baik)', '90–100 (Sangat Baik)'],
+              labels: [`< ${appSettings.kktp} (Remedial)`, `${appSettings.kktp}–79 (Cukup)`, '80–89 (Baik)', '90–100 (Sangat Baik)'],
               datasets: [{
                 label: 'Jumlah Siswa',
                 data: buckets,
@@ -2214,7 +2317,7 @@ function doPost(e) {
     }
 
     /*************************************************************************
-     * 6. VIEW 2: KISI-KISI SOAL (45 INDIKATOR)
+     * 7. VIEW 2: KISI-KISI SOAL (45 INDIKATOR)
      *************************************************************************/
     function renderKisiKisi(container) {
       const filtered = appState.questions.filter(q => {
@@ -2231,16 +2334,15 @@ function doPost(e) {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
             <h2 class="text-2xl font-extrabold text-slate-900">Kisi-Kisi Asesmen Informatika Kelas IX</h2>
-            <p class="text-sm text-slate-500 mt-0.5">MTs • Kurikulum Merdeka • Penyusun: Fitrianto Puji Pangarso, S.Kom</p>
+            <p class="text-sm text-slate-500 mt-0.5">MTs Ma'arif NU 1 Wangon • Kurikulum Merdeka • Penyusun: Fitrianto Puji Pangarso, S.Kom</p>
           </div>
           <div class="no-print flex flex-wrap gap-2">
-            <button onclick="exportKisiCSV()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition">Ekspor CSV</button>
-            <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm transition">Cetak Kisi-Kisi</button>
+            <button onclick="exportKisiCSV()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition">Ekspor CSV</button>
+            <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition">Cetak Kisi-Kisi</button>
           </div>
         </div>
 
-        <!-- Filter -->
-        <div class="no-print bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm mb-5 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="no-print bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs mb-5 grid grid-cols-1 md:grid-cols-4 gap-3">
           <input type="text" value="${escapeHtml(appState.kisiSearch)}" oninput="appState.kisiSearch=this.value; renderKisiKisi(document.getElementById('main-view'))" placeholder="Cari materi, CP, atau indikator..." class="md:col-span-2 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           <select onchange="appState.kisiTypeFilter=this.value; renderKisiKisi(document.getElementById('main-view'))" class="px-3.5 py-2 rounded-xl border border-slate-200 text-sm bg-white">
             <option value="ALL" ${appState.kisiTypeFilter === 'ALL' ? 'selected' : ''}>Semua Bentuk Soal</option>
@@ -2257,7 +2359,7 @@ function doPost(e) {
           </select>
         </div>
 
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
@@ -2298,7 +2400,7 @@ function doPost(e) {
     }
 
     /*************************************************************************
-     * 7. VIEW 3: BANK & GENERATOR SOAL (ACAK OPSI, EDIT SOAL, CETAK)
+     * 8. VIEW 3: BANK & GENERATOR SOAL
      *************************************************************************/
     function renderBankSoal(container) {
       const filtered = appState.questions.filter(q => appState.soalTypeFilter === 'ALL' || q.type === appState.soalTypeFilter);
@@ -2310,19 +2412,18 @@ function doPost(e) {
             <p class="text-sm text-slate-500 mt-0.5">No. 1–30 Pilihan Ganda • No. 31–40 PG Kompleks (2 Jawaban) • No. 41–45 Esai</p>
           </div>
           <div class="no-print flex flex-wrap gap-2">
-            <button onclick="shuffleAllOptions()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+            <button onclick="shuffleAllOptions()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition">
               Acak Opsi Jawaban
             </button>
             <button onclick="appState.showAnswerKey=!appState.showAnswerKey; renderBankSoal(document.getElementById('main-view'))" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
               ${appState.showAnswerKey ? 'Sembunyikan Kunci' : 'Tampilkan Kunci'}
             </button>
-            <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm transition">
+            <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition">
               Cetak Naskah
             </button>
           </div>
         </div>
 
-        <!-- Filter Jenis Soal -->
         <div class="no-print flex flex-wrap gap-2 mb-5">
           ${[
             { id: 'ALL', label: 'Semua (45)' },
@@ -2331,7 +2432,7 @@ function doPost(e) {
             { id: 'ESSAY', label: 'Esai 41–45' }
           ].map(t => `
             <button onclick="appState.soalTypeFilter='${t.id}'; renderBankSoal(document.getElementById('main-view'))" class="px-4 py-2 rounded-xl text-xs font-semibold transition ${
-              appState.soalTypeFilter === t.id ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              appState.soalTypeFilter === t.id ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }">${t.label}</button>
           `).join('')}
         </div>
@@ -2341,7 +2442,7 @@ function doPost(e) {
             const typeBadge = q.type === 'PG' ? 'bg-blue-50 text-blue-700' : q.type === 'PGK' ? 'bg-purple-50 text-purple-700' : 'bg-amber-50 text-amber-700';
             const typeLabel = q.type === 'PG' ? 'Pilihan Ganda' : q.type === 'PGK' ? 'PG Kompleks (2 Jawaban)' : 'Esai';
             return `
-              <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
+              <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs print-card">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center">${q.no}</span>
@@ -2349,8 +2450,9 @@ function doPost(e) {
                     <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-bold">${q.level}</span>
                     <span class="text-xs text-slate-500 font-medium hidden sm:inline">• ${escapeHtml(q.materi)}</span>
                   </div>
-                  <button onclick="openEditQuestionModal(${q.no})" class="no-print px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 text-xs font-semibold transition">
-                    Edit Soal
+                  <button onclick="openEditQuestionModal(${q.no})" class="no-print px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 text-xs font-semibold transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    Edit Soal & Kunci
                   </button>
                 </div>
 
@@ -2412,59 +2514,72 @@ function doPost(e) {
       showToast('Urutan opsi jawaban untuk 40 soal PG & PGK berhasil diacak!');
     }
 
-    function openEditQuestionModal(no) {
+    function openEditQuestionModal(no, originTab = 'soal') {
       const q = appState.questions.find(item => item.no === no);
       if (!q) return;
 
       openModal(`
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-slate-900">Edit Soal No. ${q.no} (${q.type})</h3>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Edit Soal No. ${q.no} (${q.type})</h3>
+            <p class="text-xs text-slate-500">${escapeHtml(q.materi)} • Level ${q.level}</p>
+          </div>
           <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
         </div>
-        <form onsubmit="saveEditedQuestion(event, ${q.no})" class="p-5 space-y-4 overflow-y-auto">
+        <form onsubmit="saveEditedQuestion(event, ${q.no}, '${originTab}')" class="p-5 space-y-4 overflow-y-auto">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Pertanyaan</label>
-            <textarea id="edit-q-text" rows="3" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">${escapeHtml(q.question)}</textarea>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Pertanyaan Soal</label>
+            <textarea id="edit-q-text" rows="3" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">${escapeHtml(q.question)}</textarea>
           </div>
           ${q.type !== 'ESSAY' ? `
             <div class="space-y-2.5">
-              <label class="block text-xs font-bold text-slate-700">Opsi Jawaban ${q.type === 'PGK' ? '(Centang tepat 2 kunci benar)' : '(Pilih 1 kunci benar)'}</label>
+              <label class="block text-xs font-bold text-slate-700">Opsi Jawaban ${q.type === 'PGK' ? '(Pilih tepat 2 kunci benar)' : '(Pilih 1 kunci benar)'}</label>
               ${q.options.map((opt, idx) => {
                 const checked = q.type === 'PG' ? q.answer === idx : q.answers.includes(idx);
                 return `
                   <div class="flex items-center gap-2">
                     <input type="${q.type === 'PG' ? 'radio' : 'checkbox'}" name="edit-q-ans" value="${idx}" ${checked ? 'checked' : ''} class="w-4 h-4 accent-indigo-600">
                     <span class="text-xs font-bold text-slate-500 w-5">${OPTION_LETTERS[idx]}.</span>
-                    <input type="text" id="edit-q-opt-${idx}" value="${escapeHtml(opt)}" required class="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                    <input type="text" id="edit-q-opt-${idx}" value="${escapeHtml(opt)}" required class="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                   </div>
                 `;
               }).join('')}
             </div>
           ` : `
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Kunci / Pedoman Penskoran</label>
-              <textarea id="edit-q-sample" rows="3" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">${escapeHtml(q.sampleAnswer)}</textarea>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Kunci / Pedoman Penskoran (Maks. 4)</label>
+              <textarea id="edit-q-sample" rows="3" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">${escapeHtml(q.sampleAnswer)}</textarea>
             </div>
           `}
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Pembahasan / Catatan</label>
+            <textarea id="edit-q-exp" rows="2" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">${escapeHtml(q.explanation || '')}</textarea>
+          </div>
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-indigo-50 border border-indigo-100 cursor-pointer">
+            <input type="checkbox" id="edit-q-recalc" checked class="w-4 h-4 accent-indigo-600 rounded">
+            <span class="text-xs font-semibold text-indigo-900">Hitung ulang semua nilai siswa otomatis setelah simpan</span>
+          </label>
           <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
             <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
-            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan Soal</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">Simpan Perubahan Soal</button>
           </div>
         </form>
       `);
     }
 
-    function saveEditedQuestion(e, no) {
+    function saveEditedQuestion(e, no, originTab = 'soal') {
       e.preventDefault();
       const q = appState.questions.find(item => item.no === no);
       if (!q) return;
 
       q.question = document.getElementById('edit-q-text').value.trim();
+      q.explanation = document.getElementById('edit-q-exp')?.value.trim() || '';
+
       if (q.type !== 'ESSAY') {
         q.options = [0, 1, 2, 3].map(idx => document.getElementById(`edit-q-opt-${idx}`).value.trim());
         const checkedVals = Array.from(document.querySelectorAll('input[name="edit-q-ans"]:checked')).map(el => Number(el.value));
         if (q.type === 'PG') {
-          if (checkedVals.length !== 1) return showToast('Pilih 1 kunci jawaban benar!', 'warning');
+          if (checkedVals.length !== 1) return showToast('Pilih tepat 1 kunci jawaban benar!', 'warning');
           q.answer = checkedVals[0];
         } else {
           if (checkedVals.length !== 2) return showToast('Soal PGK wajib memiliki tepat 2 kunci jawaban benar!', 'warning');
@@ -2473,18 +2588,52 @@ function doPost(e) {
       } else {
         q.sampleAnswer = document.getElementById('edit-q-sample').value.trim();
       }
+
+      const shouldRecalc = document.getElementById('edit-q-recalc')?.checked;
       saveState();
       cloudPost({ action: 'saveQuestions', questions: appState.questions }, true);
+
+      if (shouldRecalc) {
+        recalculateAllSubmissions(true);
+      }
+
       closeModal();
-      renderBankSoal(document.getElementById('main-view'));
-      showToast(`Soal nomor ${no} berhasil diperbarui!`);
+      if (originTab === 'analisis') {
+        renderAnalisisNilai(document.getElementById('main-view'));
+      } else {
+        renderBankSoal(document.getElementById('main-view'));
+      }
+      showToast(`Soal nomor ${no} berhasil diperbarui!${shouldRecalc ? ' Nilai siswa dihitung ulang.' : ''}`);
     }
 
     /*************************************************************************
-     * 8. VIEW 4: DATA SISWA (PER KELAS 9A–9K, IMPORT EXCEL, EDIT & HAPUS MASSAL)
+     * 9. VIEW 4: DATA SISWA (DENGAN FITUR EDIT, HAPUS TUNGGAL, HAPUS TERPILIH,
+     * HAPUS KELAS, RESET PERCOBAAN & IMPOR EXCEL MULTI-FILE)
      *************************************************************************/
     function setSiswaKelas(cls) {
       appState.siswaKelasFilter = cls;
+      appState.selectedStudentIds.clear();
+      renderDataSiswa(document.getElementById('main-view'));
+    }
+
+    function toggleSelectAllStudents(checked) {
+      const activeKelas = appState.siswaKelasFilter;
+      const visible = appState.students.filter(st => {
+        const matchSearch = !appState.siswaSearch || st.name.toLowerCase().includes(appState.siswaSearch.toLowerCase()) || st.nis.includes(appState.siswaSearch);
+        const matchKelas = activeKelas === 'ALL' || st.kelas === activeKelas;
+        return matchSearch && matchKelas;
+      });
+      if (checked) {
+        visible.forEach(st => appState.selectedStudentIds.add(st.id));
+      } else {
+        visible.forEach(st => appState.selectedStudentIds.delete(st.id));
+      }
+      renderDataSiswa(document.getElementById('main-view'));
+    }
+
+    function toggleSelectStudent(id, checked) {
+      if (checked) appState.selectedStudentIds.add(id);
+      else appState.selectedStudentIds.delete(id);
       renderDataSiswa(document.getElementById('main-view'));
     }
 
@@ -2501,71 +2650,99 @@ function doPost(e) {
         return matchSearch && matchKelas;
       });
 
+      const selectedCount = appState.selectedStudentIds.size;
+      const allSelected = filtered.length > 0 && filtered.every(st => appState.selectedStudentIds.has(st.id));
+
       container.innerHTML = `
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
           <div>
             <h2 class="text-2xl font-extrabold text-slate-900">Data Siswa ${activeKelas === 'ALL' ? 'Kelas 9A–9K' : 'Kelas ' + activeKelas}</h2>
-            <p class="text-sm text-slate-500 mt-0.5">Kelola peserta ujian per kelas: tambah manual, impor Excel (.xlsx/.csv), edit, atau hapus massal</p>
+            <p class="text-sm text-slate-500 mt-0.5">Kelola peserta ujian per kelas: Tambah, Impor Excel, Edit, Hapus, atau Reset Percobaan Ujian Siswa</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button onclick="openImportExcelModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+            <button onclick="openImportExcelModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
               Import Excel
             </button>
-            <button onclick="openAddStudentModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+            <button onclick="openAddStudentModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
               Tambah Siswa
             </button>
+            <button onclick="exportSiswaCSV()" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+              Ekspor CSV
+            </button>
             <button onclick="openDeleteClassStudentsModal('${activeKelas}')" class="px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              ${activeKelas === 'ALL' ? 'Hapus Semua per Kelas' : 'Hapus Semua ' + activeKelas}
+              ${activeKelas === 'ALL' ? 'Hapus per Kelas' : 'Hapus Semua ' + activeKelas}
             </button>
           </div>
         </div>
 
         ${renderClassTabs(activeKelas, 'setSiswaKelas', countMap, true)}
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm mb-5 flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <!-- Search & Batch Action Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs mb-5 flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div class="relative w-full sm:flex-1">
             <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" value="${escapeHtml(appState.siswaSearch)}" oninput="appState.siswaSearch=this.value; renderDataSiswa(document.getElementById('main-view'))" placeholder="Cari nama atau NIS siswa..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           </div>
-          <span class="text-xs font-semibold text-slate-500 shrink-0">Menampilkan ${filtered.length} siswa</span>
+          ${selectedCount > 0 ? `
+            <div class="flex items-center gap-2 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl shrink-0">
+              <span class="text-xs font-bold text-rose-700">${selectedCount} siswa dipilih</span>
+              <button onclick="confirmDeleteSelectedStudents()" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">Hapus Terpilih</button>
+              <button onclick="appState.selectedStudentIds.clear(); renderDataSiswa(document.getElementById('main-view'))" class="text-xs text-rose-600 hover:underline">Batal</button>
+            </div>
+          ` : `
+            <span class="text-xs font-semibold text-slate-500 shrink-0">Menampilkan ${filtered.length} siswa</span>
+          `}
         </div>
 
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
                 <tr>
-                  <th class="px-5 py-3.5 font-semibold w-12 text-center">No</th>
-                  <th class="px-5 py-3.5 font-semibold">NIS</th>
-                  <th class="px-5 py-3.5 font-semibold">Nama Lengkap</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">Kelas</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">L/P</th>
-                  <th class="px-5 py-3.5 font-semibold text-center">Status Ujian</th>
-                  <th class="px-5 py-3.5 font-semibold text-right">Aksi</th>
+                  <th class="px-4 py-3.5 text-center w-10">
+                    <input type="checkbox" onchange="toggleSelectAllStudents(this.checked)" ${allSelected ? 'checked' : ''} class="w-4 h-4 accent-indigo-600 rounded">
+                  </th>
+                  <th class="px-3 py-3.5 font-semibold w-10 text-center">No</th>
+                  <th class="px-4 py-3.5 font-semibold">NIS</th>
+                  <th class="px-4 py-3.5 font-semibold">Nama Lengkap</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">Kelas</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">L/P</th>
+                  <th class="px-4 py-3.5 font-semibold text-center">Status Ujian</th>
+                  <th class="px-4 py-3.5 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 ${filtered.length === 0 ? `
-                  <tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada data siswa di ${activeKelas === 'ALL' ? 'daftar ini' : 'kelas ' + activeKelas}. Gunakan tombol Tambah Siswa atau Import Excel.</td></tr>
+                  <tr><td colspan="8" class="p-8 text-center text-slate-400">Belum ada data siswa di ${activeKelas === 'ALL' ? 'daftar ini' : 'kelas ' + activeKelas}. Klik Tambah Siswa atau Import Excel.</td></tr>
                 ` : filtered.map((st, idx) => {
                   const sub = appState.submissions.find(s => s.studentId === st.id);
+                  const isChecked = appState.selectedStudentIds.has(st.id);
+                  const attempt = sub ? (Number(sub.attemptCount) || 1) : 0;
                   return `
-                    <tr class="hover:bg-slate-50/80 transition">
-                      <td class="px-5 py-3.5 text-center text-xs font-bold text-slate-400">${idx + 1}</td>
-                      <td class="px-5 py-3.5 font-mono text-xs text-slate-600">${escapeHtml(st.nis)}</td>
-                      <td class="px-5 py-3.5 font-semibold text-slate-900">${escapeHtml(st.name)}</td>
-                      <td class="px-5 py-3.5 text-center"><span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">${escapeHtml(st.kelas)}</span></td>
-                      <td class="px-5 py-3.5 text-center text-slate-600">${escapeHtml(st.gender)}</td>
-                      <td class="px-5 py-3.5 text-center">
+                    <tr class="hover:bg-slate-50/80 transition ${isChecked ? 'bg-indigo-50/50' : ''}">
+                      <td class="px-4 py-3.5 text-center">
+                        <input type="checkbox" onchange="toggleSelectStudent('${st.id}', this.checked)" ${isChecked ? 'checked' : ''} class="w-4 h-4 accent-indigo-600 rounded">
+                      </td>
+                      <td class="px-3 py-3.5 text-center text-xs font-bold text-slate-400">${idx + 1}</td>
+                      <td class="px-4 py-3.5 font-mono text-xs text-slate-600">${escapeHtml(st.nis)}</td>
+                      <td class="px-4 py-3.5 font-semibold text-slate-900">${escapeHtml(st.name)}</td>
+                      <td class="px-3 py-3.5 text-center"><span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">${escapeHtml(st.kelas)}</span></td>
+                      <td class="px-3 py-3.5 text-center text-slate-600">${escapeHtml(st.gender)}</td>
+                      <td class="px-4 py-3.5 text-center">
                         ${sub
-                          ? `<span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">Sudah (${sub.totalScore})</span>`
+                          ? `<span class="px-2.5 py-1 rounded-full ${sub.totalScore >= appSettings.kktp ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'} text-xs font-semibold">
+                              Nilai: ${sub.totalScore} (P${attempt})
+                             </span>`
                           : `<span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold">Belum Ujian</span>`
                         }
                       </td>
-                      <td class="px-5 py-3.5 text-right whitespace-nowrap space-x-1.5">
+                      <td class="px-4 py-3.5 text-right whitespace-nowrap space-x-1">
+                        ${sub ? `
+                          <button onclick="confirmResetStudentAttempt('${st.id}')" title="Izinkan Siswa Ujian Ulang di HP" class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-semibold transition">Reset Ujian</button>
+                        ` : ''}
                         <button onclick="openStudentExamMode('${st.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold transition">Kerjakan</button>
                         <button onclick="openEditStudentModal('${st.id}')" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">Edit</button>
                         <button onclick="confirmDeleteStudent('${st.id}')" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold transition">Hapus</button>
@@ -2580,6 +2757,18 @@ function doPost(e) {
       `;
     }
 
+    function exportSiswaCSV() {
+      const activeKelas = appState.siswaKelasFilter;
+      const list = activeKelas === 'ALL' ? appState.students : appState.students.filter(s => s.kelas === activeKelas);
+      const rows = [['NIS', 'Nama Lengkap', 'Kelas', 'Jenis Kelamin', 'Status Ujian', 'Nilai Akhir']];
+      list.forEach(st => {
+        const sub = appState.submissions.find(s => s.studentId === st.id);
+        rows.push([st.nis, st.name, st.kelas, st.gender, sub ? 'Sudah Ujian' : 'Belum Ujian', sub ? sub.totalScore : '-']);
+      });
+      const suffix = activeKelas === 'ALL' ? 'Semua_Kelas' : 'Kelas_' + activeKelas;
+      downloadCSV(`Data_Siswa_Asesmen_Informatika_${suffix}.csv`, rows);
+    }
+
     function openAddStudentModal() {
       const defaultCls = appState.siswaKelasFilter === 'ALL' ? '9A' : appState.siswaKelasFilter;
       openModal(`
@@ -2590,11 +2779,11 @@ function doPost(e) {
         <form onsubmit="addNewStudent(event)" class="p-5 space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">NIS</label>
-            <input type="text" id="new-st-nis" required placeholder="Contoh: 20260950" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">
+            <input type="text" id="new-st-nis" required placeholder="Contoh: 20260950" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-            <input type="text" id="new-st-name" required placeholder="Contoh: Muhammad Rizky" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">
+            <input type="text" id="new-st-name" required placeholder="Contoh: Muhammad Rizky" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -2613,7 +2802,7 @@ function doPost(e) {
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
             <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
-            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan Siswa</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">Simpan Siswa</button>
           </div>
         </form>
       `);
@@ -2641,17 +2830,20 @@ function doPost(e) {
       if (!st) return;
       openModal(`
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-slate-900">Edit Data Siswa</h3>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Edit Data Siswa</h3>
+            <p class="text-xs text-slate-500">Perubahan nama/kelas otomatis menyelaraskan data nilai ujian</p>
+          </div>
           <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
         </div>
         <form onsubmit="saveEditedStudent(event, '${st.id}')" class="p-5 space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">NIS</label>
-            <input type="text" id="edit-st-nis" required value="${escapeHtml(st.nis)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">
+            <input type="text" id="edit-st-nis" required value="${escapeHtml(st.nis)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-            <input type="text" id="edit-st-name" required value="${escapeHtml(st.name)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">
+            <input type="text" id="edit-st-name" required value="${escapeHtml(st.name)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -2670,7 +2862,7 @@ function doPost(e) {
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
             <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
-            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan Perubahan</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">Simpan Perubahan</button>
           </div>
         </form>
       `);
@@ -2708,7 +2900,7 @@ function doPost(e) {
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
           </div>
           <h3 class="text-lg font-bold text-slate-900">Hapus Data Siswa?</h3>
-          <p class="text-sm text-slate-600">Siswa <strong>${escapeHtml(st.name)} (${escapeHtml(st.kelas)})</strong> beserta hasil nilainya akan dihapus permanen.</p>
+          <p class="text-sm text-slate-600">Siswa <strong>${escapeHtml(st.name)} (${escapeHtml(st.kelas)})</strong> beserta data nilainya akan dihapus permanen.</p>
           <div class="flex gap-3 pt-2">
             <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
             <button onclick="deleteStudent('${st.id}'); closeModal();" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Ya, Hapus</button>
@@ -2720,10 +2912,68 @@ function doPost(e) {
     function deleteStudent(id) {
       appState.students = appState.students.filter(s => s.id !== id);
       appState.submissions = appState.submissions.filter(s => s.studentId !== id);
+      appState.selectedStudentIds.delete(id);
       saveState();
       cloudPost({ action: 'saveAll', students: appState.students, submissions: appState.submissions }, true);
       renderDataSiswa(document.getElementById('main-view'));
       showToast('Data siswa telah dihapus.', 'info');
+    }
+
+    function confirmDeleteSelectedStudents() {
+      const count = appState.selectedStudentIds.size;
+      if (count === 0) return;
+      openModal(`
+        <div class="p-6 text-center space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Hapus ${count} Siswa Terpilih?</h3>
+          <p class="text-sm text-slate-600">Seluruh siswa yang dicentang beserta hasil nilai ujiannya akan dihapus permanen.</p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="executeDeleteSelectedStudents()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Ya, Hapus Terpilih</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeDeleteSelectedStudents() {
+      const ids = Array.from(appState.selectedStudentIds);
+      appState.students = appState.students.filter(s => !appState.selectedStudentIds.has(s.id));
+      appState.submissions = appState.submissions.filter(s => !appState.selectedStudentIds.has(s.studentId));
+      appState.selectedStudentIds.clear();
+      saveState();
+      cloudPost({ action: 'saveAll', students: appState.students, submissions: appState.submissions }, true);
+      closeModal();
+      renderDataSiswa(document.getElementById('main-view'));
+      showToast(`${ids.length} siswa terpilih berhasil dihapus!`);
+    }
+
+    function confirmResetStudentAttempt(id) {
+      const st = appState.students.find(s => s.id === id);
+      if (!st) return;
+      openModal(`
+        <div class="p-6 text-center space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">↺</div>
+          <h3 class="text-lg font-bold text-slate-900">Reset Percobaan Ujian?</h3>
+          <p class="text-sm text-slate-600">Siswa <strong>${escapeHtml(st.name)} (${escapeHtml(st.kelas)})</strong> akan diizinkan login dan mengerjakan ujian ulang di HP (percobaan direset ke 0).</p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="resetStudentAttempt('${st.id}'); closeModal();" class="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold">Ya, Reset Percobaan</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function resetStudentAttempt(id) {
+      const sub = appState.submissions.find(s => s.studentId === id);
+      if (sub) {
+        sub.attemptCount = 0;
+      }
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      renderDataSiswa(document.getElementById('main-view'));
+      showToast('Percobaan ujian siswa berhasil direset. Siswa kini bisa mengerjakan ulang di HP.');
     }
 
     function openDeleteClassStudentsModal(defaultKelas) {
@@ -2734,9 +2984,9 @@ function doPost(e) {
             <h3 class="text-lg font-bold text-rose-700">Hapus Semua Siswa per Kelas</h3>
             <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
           </div>
-          <p class="text-sm text-slate-600">Pilih kelas yang seluruh data siswa beserta nilai ujiannya ingin dihapus. Tindakan ini tidak dapat dibatalkan.</p>
+          <p class="text-sm text-slate-600">Pilih kelas yang seluruh data siswa beserta nilai ujiannya ingin dihapus. Tindakan ini permanen.</p>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Kelas Target</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Kelas Sasaran</label>
             <select id="delete-all-kelas-select" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white font-semibold">
               ${CLASSES.map(c => {
                 const cnt = appState.students.filter(s => s.kelas === c).length;
@@ -2783,7 +3033,6 @@ function doPost(e) {
       const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
       if (!matrix.length) return [];
 
-      // Cari baris header (mendukung format EMIS/Dapodik yang punya judul di baris atas)
       let headerIdx = -1;
       let nameCol = -1, nisCol = -1, kelasCol = -1, jkCol = -1;
 
@@ -2875,7 +3124,7 @@ function doPost(e) {
           <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="text-xs text-indigo-900">
               <p class="font-bold">Deteksi Kelas Otomatis (9A–9K):</p>
-              <p class="mt-0.5">Anda dapat langsung memilih seluruh file seperti <strong>Data_Siswa_9A</strong> s.d. <strong>9K.xls</strong> sekaligus. Kelas otomatis dikenali dari nama file atau kolom Kelas.</p>
+              <p class="mt-0.5">Pilih seluruh file per kelas sekaligus (misal <strong>9A.xlsx</strong> s.d. <strong>9K.xlsx</strong>). Kelas otomatis terdeteksi.</p>
             </div>
             <button type="button" onclick="downloadStudentExcelTemplate()" class="px-3.5 py-2 rounded-xl bg-white border border-indigo-200 hover:bg-indigo-100 text-indigo-700 text-xs font-bold shrink-0 transition">
               Unduh Template .xlsx
@@ -2890,14 +3139,14 @@ function doPost(e) {
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Pilih File Excel (bisa pilih banyak file)</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Pilih File Excel (bisa banyak file)</label>
               <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" multiple onchange="handleExcelFileUpload(event)" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-slate-200 rounded-xl p-1">
             </div>
           </div>
 
           <label class="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
             <input type="checkbox" id="excel-replace-mode" checked class="w-4 h-4 accent-indigo-600 rounded">
-            <span class="text-xs font-semibold text-slate-700">Ganti data siswa lama pada kelas yang diimpor (direkomendasikan agar data contoh terganti bersih)</span>
+            <span class="text-xs font-semibold text-slate-700">Ganti data siswa lama pada kelas yang diimpor (agar data contoh lama terganti bersih)</span>
           </label>
 
           <div id="excel-preview-box" class="hidden space-y-2.5">
@@ -2969,7 +3218,7 @@ function doPost(e) {
         pendingExcelRows = allArrays.flat();
 
         if (pendingExcelRows.length === 0) {
-          showToast('Tidak ditemukan baris siswa valid. Pastikan file memiliki kolom "Nama".', 'error');
+          showToast('Tidak ditemukan data siswa valid. Pastikan ada kolom "Nama".', 'error');
           previewBox.classList.add('hidden');
           btn.disabled = true;
           return;
@@ -2995,7 +3244,7 @@ function doPost(e) {
         previewBox.classList.remove('hidden');
         btn.disabled = false;
       } catch (err) {
-        showToast('Gagal membaca file Excel. Pastikan format file benar.', 'error');
+        showToast('Gagal membaca file Excel.', 'error');
       }
     }
 
@@ -3029,19 +3278,41 @@ function doPost(e) {
       renderDataSiswa(document.getElementById('main-view'));
       showToast(`${count} siswa (${importedClasses.join(', ')}) berhasil diimpor & disinkronkan!`);
     }
-
     /*************************************************************************
-     * 9. VIEW 5: DAFTAR NILAI & KOREKSI ESAI (PER KELAS 9A–9K)
+     * 10. VIEW 5: DAFTAR NILAI (KOREKSI ESAI, EDIT NILAI LENGKAP,
+     * HAPUS NILAI TUNGGAL, HAPUS NILAI TERPILIH, RESET PERCOBAAN, & HITUNG ULANG)
      *************************************************************************/
     function setNilaiKelas(cls) {
       appState.nilaiKelasFilter = cls;
+      appState.selectedSubmissionIds.clear();
+      renderDaftarNilai(document.getElementById('main-view'));
+    }
+
+    function toggleSelectAllSubmissions(checked) {
+      const activeKelas = appState.nilaiKelasFilter;
+      const visible = appState.submissions.filter(s => {
+        const matchSearch = !appState.nilaiSearch || s.studentName.toLowerCase().includes(appState.nilaiSearch.toLowerCase());
+        const matchKelas = activeKelas === 'ALL' || s.kelas === activeKelas;
+        return matchSearch && matchKelas;
+      });
+      if (checked) {
+        visible.forEach(s => appState.selectedSubmissionIds.add(s.id));
+      } else {
+        visible.forEach(s => appState.selectedSubmissionIds.delete(s.id));
+      }
+      renderDaftarNilai(document.getElementById('main-view'));
+    }
+
+    function toggleSelectSubmission(id, checked) {
+      if (checked) appState.selectedSubmissionIds.add(id);
+      else appState.selectedSubmissionIds.delete(id);
       renderDaftarNilai(document.getElementById('main-view'));
     }
 
     function getPredikat(score) {
       if (score >= 90) return { label: 'A (Sangat Baik)', cls: 'bg-emerald-50 text-emerald-700' };
       if (score >= 80) return { label: 'B (Baik)', cls: 'bg-sky-50 text-sky-700' };
-      if (score >= 75) return { label: 'C (Cukup)', cls: 'bg-amber-50 text-amber-700' };
+      if (score >= appSettings.kktp) return { label: 'C (Cukup)', cls: 'bg-amber-50 text-amber-700' };
       return { label: 'D (Remedial)', cls: 'bg-rose-50 text-rose-700' };
     }
 
@@ -3050,82 +3321,129 @@ function doPost(e) {
       const countMap = { ALL: appState.submissions.length };
       CLASSES.forEach(c => { countMap[c] = appState.submissions.filter(s => s.kelas === c).length; });
 
-      const filtered = activeKelas === 'ALL'
-        ? appState.submissions
-        : appState.submissions.filter(s => s.kelas === activeKelas);
+      const filtered = appState.submissions.filter(s => {
+        const matchSearch = !appState.nilaiSearch || s.studentName.toLowerCase().includes(appState.nilaiSearch.toLowerCase());
+        const matchKelas = activeKelas === 'ALL' || s.kelas === activeKelas;
+        return matchSearch && matchKelas;
+      });
 
       const avg = filtered.length ? (filtered.reduce((a, b) => a + b.totalScore, 0) / filtered.length).toFixed(1) : '0.0';
-      const tuntas = filtered.filter(s => s.totalScore >= KKTP).length;
+      const tuntas = filtered.filter(s => s.totalScore >= appSettings.kktp).length;
+      const selectedCount = appState.selectedSubmissionIds.size;
+      const allSelected = filtered.length > 0 && filtered.every(s => appState.selectedSubmissionIds.has(s.id));
 
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
-            <h2 class="text-2xl font-extrabold text-slate-900">Daftar Nilai & Koreksi ${activeKelas === 'ALL' ? '(Semua Kelas)' : 'Kelas ' + activeKelas}</h2>
-            <p class="text-sm text-slate-500 mt-0.5">Bobot: PG (60) + PGK 2 Jawaban (20) + Esai (20) = 100 • KKTP: ${KKTP}</p>
+            <h2 class="text-2xl font-extrabold text-slate-900">Daftar Nilai & Evaluasi ${activeKelas === 'ALL' ? '(Semua Kelas)' : 'Kelas ' + activeKelas}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">Bobot: PG (60) + PGK (20) + Esai (20) = 100 • KKTP: <span class="font-bold text-indigo-700">${appSettings.kktp}</span></p>
           </div>
-          <button onclick="exportNilaiCSV()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition self-start sm:self-auto">
-            Ekspor Nilai ${activeKelas === 'ALL' ? 'Semua' : activeKelas} (CSV)
-          </button>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="recalculateAllSubmissions()" title="Hitung ulang jika ada kunci jawaban yang direvisi" class="px-3.5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold border border-indigo-200 transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Hitung Ulang Nilai
+            </button>
+            <button onclick="exportNilaiCSV()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              Ekspor CSV
+            </button>
+            <button onclick="openDeleteClassSubmissionsModal('${activeKelas}')" class="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Hapus Nilai Kelas
+            </button>
+          </div>
         </div>
 
         ${renderClassTabs(activeKelas, 'setNilaiKelas', countMap, true)}
 
-        <div class="grid grid-cols-3 gap-3 mb-5">
-          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+        <!-- KPI Rangkuman Nilai -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             <p class="text-xs font-semibold text-slate-500">Peserta Dinilai</p>
             <p class="text-2xl font-extrabold text-slate-900 mt-0.5">${filtered.length} <span class="text-xs font-normal text-slate-400">siswa</span></p>
           </div>
-          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             <p class="text-xs font-semibold text-slate-500">Rata-Rata ${activeKelas === 'ALL' ? 'Semua' : activeKelas}</p>
             <p class="text-2xl font-extrabold text-indigo-600 mt-0.5">${avg}</p>
           </div>
-          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
-            <p class="text-xs font-semibold text-slate-500">Tuntas / Remedial</p>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+            <p class="text-xs font-semibold text-slate-500">Tuntas / Remedial (KKTP ≥ ${appSettings.kktp})</p>
             <p class="text-2xl font-extrabold mt-0.5"><span class="text-emerald-600">${tuntas}</span> <span class="text-slate-300">/</span> <span class="text-rose-600">${filtered.length - tuntas}</span></p>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <!-- Search & Batch Delete Action Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs mb-5 flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="relative w-full sm:flex-1">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" value="${escapeHtml(appState.nilaiSearch)}" oninput="appState.nilaiSearch=this.value; renderDaftarNilai(document.getElementById('main-view'))" placeholder="Cari nama siswa di daftar nilai..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          ${selectedCount > 0 ? `
+            <div class="flex items-center gap-2 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl shrink-0">
+              <span class="text-xs font-bold text-rose-700">${selectedCount} nilai dipilih</span>
+              <button onclick="confirmDeleteSelectedSubmissions()" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">Hapus Terpilih</button>
+              <button onclick="appState.selectedSubmissionIds.clear(); renderDaftarNilai(document.getElementById('main-view'))" class="text-xs text-rose-600 hover:underline">Batal</button>
+            </div>
+          ` : `
+            <span class="text-xs font-semibold text-slate-500 shrink-0">Menampilkan ${filtered.length} lembar ujian</span>
+          `}
+        </div>
+
+        <!-- Tabel Daftar Nilai -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
                 <tr>
+                  <th class="px-4 py-3.5 text-center w-10">
+                    <input type="checkbox" onchange="toggleSelectAllSubmissions(this.checked)" ${allSelected ? 'checked' : ''} class="w-4 h-4 accent-indigo-600 rounded">
+                  </th>
                   <th class="px-4 py-3.5 font-semibold">Nama Siswa</th>
-                  <th class="px-4 py-3.5 font-semibold text-center">Kelas</th>
-                  <th class="px-4 py-3.5 font-semibold text-center">PG (60)</th>
-                  <th class="px-4 py-3.5 font-semibold text-center">PGK (20)</th>
-                  <th class="px-4 py-3.5 font-semibold text-center">Esai (20)</th>
-                  <th class="px-4 py-3.5 font-semibold text-center">Total</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">Kelas</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">PG (60)</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">PGK (20)</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">Esai (20)</th>
+                  <th class="px-3 py-3.5 font-semibold text-center">Total</th>
                   <th class="px-4 py-3.5 font-semibold text-center">Predikat</th>
-                  <th class="px-4 py-3.5 font-semibold text-right">Koreksi</th>
+                  <th class="px-4 py-3.5 font-semibold text-right">Aksi Kelola</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 ${filtered.length === 0 ? `
-                  <tr><td colspan="8" class="p-8 text-center text-slate-400">Belum ada data nilai siswa untuk ${activeKelas === 'ALL' ? 'filter ini' : 'kelas ' + activeKelas}.</td></tr>
+                  <tr><td colspan="9" class="p-8 text-center text-slate-400">Belum ada data nilai ujian untuk ${activeKelas === 'ALL' ? 'daftar ini' : 'kelas ' + activeKelas}.</td></tr>
                 ` : filtered.map(s => {
                   const pred = getPredikat(s.totalScore);
                   const att = Number(s.attemptCount) || 1;
+                  const isChecked = appState.selectedSubmissionIds.has(s.id);
                   return `
-                    <tr class="hover:bg-slate-50/80 transition">
+                    <tr class="hover:bg-slate-50/80 transition ${isChecked ? 'bg-indigo-50/50' : ''}">
+                      <td class="px-4 py-3.5 text-center">
+                        <input type="checkbox" onchange="toggleSelectSubmission('${s.id}', this.checked)" ${isChecked ? 'checked' : ''} class="w-4 h-4 accent-indigo-600 rounded">
+                      </td>
                       <td class="px-4 py-3.5">
                         <p class="font-semibold text-slate-900">${escapeHtml(s.studentName)}</p>
                         <p class="text-[11px] text-slate-400">
                           ${escapeHtml(s.submittedAt)} • ${escapeHtml(s.durationUsed)}
-                          <span class="ml-1 px-1.5 py-0.5 rounded font-bold ${att >= 2 ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600'}">Percobaan ${att}/2${att >= 2 ? ' (Terkunci)' : ''}</span>
+                          <span class="ml-1 px-1.5 py-0.5 rounded font-bold ${att >= 2 ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600'}">Percobaan ${att}/2</span>
                         </p>
                       </td>
-                      <td class="px-4 py-3.5 text-center font-bold text-indigo-700">${escapeHtml(s.kelas)}</td>
-                      <td class="px-4 py-3.5 text-center">${s.pgScore}</td>
-                      <td class="px-4 py-3.5 text-center">${s.pgkScore}</td>
-                      <td class="px-4 py-3.5 text-center font-semibold text-amber-700">${s.essayScore}</td>
-                      <td class="px-4 py-3.5 text-center font-extrabold text-indigo-700 text-base">${s.totalScore}</td>
+                      <td class="px-3 py-3.5 text-center font-bold text-indigo-700">${escapeHtml(s.kelas)}</td>
+                      <td class="px-3 py-3.5 text-center font-medium">${s.pgScore}</td>
+                      <td class="px-3 py-3.5 text-center font-medium">${s.pgkScore}</td>
+                      <td class="px-3 py-3.5 text-center font-semibold text-amber-700">${s.essayScore}</td>
+                      <td class="px-3 py-3.5 text-center font-extrabold text-indigo-700 text-base">${s.totalScore}</td>
                       <td class="px-4 py-3.5 text-center">
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${pred.cls}">${pred.label}</span>
                       </td>
-                      <td class="px-4 py-3.5 text-right">
-                        <button onclick="openEssayGradingModal('${s.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
+                      <td class="px-4 py-3.5 text-right whitespace-nowrap space-x-1">
+                        <button onclick="openEssayGradingModal('${s.id}')" title="Koreksi 5 butir soal esai" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
                           Koreksi Esai
+                        </button>
+                        <button onclick="openEditNilaiModal('${s.id}')" title="Edit perolehan nilai, skor, atau percobaan siswa" class="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold transition">
+                          Edit Nilai
+                        </button>
+                        <button onclick="confirmDeleteSubmission('${s.id}')" title="Hapus nilai ujian ini (siswa dapat ujian ulang)" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold transition">
+                          Hapus Nilai
                         </button>
                       </td>
                     </tr>
@@ -3147,13 +3465,13 @@ function doPost(e) {
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h3 class="text-lg font-bold text-slate-900">Koreksi Esai — ${escapeHtml(sub.studentName)}</h3>
-            <p class="text-xs text-slate-500">Kelas ${escapeHtml(sub.kelas)} • Beri skor 0–4 untuk setiap soal (No. 41–45)</p>
+            <p class="text-xs text-slate-500">Kelas ${escapeHtml(sub.kelas)} • Beri skor 0–4 untuk setiap butir soal (No. 41–45)</p>
           </div>
           <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
         </div>
         <form onsubmit="saveEssayGrades(event, '${sub.id}')" class="p-5 space-y-4 overflow-y-auto">
           ${essayQs.map(q => {
-            const ansText = sub.answers?.[q.no] || '(Tidak dijawab)';
+            const ansText = sub.answers?.[q.no] || '(Tidak dijawab siswa)';
             const currentScore = sub.essayScores?.[q.no] ?? 0;
             return `
               <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
@@ -3161,7 +3479,7 @@ function doPost(e) {
                   <span class="text-xs font-bold text-indigo-700">Soal No. ${q.no} (${escapeHtml(q.materi)})</span>
                   <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-slate-600">Skor (0–4):</label>
-                    <input type="number" min="0" max="4" id="grade-q-${q.no}" value="${currentScore}" class="w-16 px-2.5 py-1 rounded-lg border border-slate-300 text-center text-sm font-bold bg-white">
+                    <input type="number" min="0" max="4" id="grade-q-${q.no}" value="${currentScore}" class="w-16 px-2.5 py-1 rounded-lg border border-slate-300 text-center text-sm font-bold bg-white focus:ring-2 focus:ring-indigo-500">
                   </div>
                 </div>
                 <p class="text-xs text-slate-700 font-medium">${escapeHtml(q.question)}</p>
@@ -3169,13 +3487,13 @@ function doPost(e) {
                   <span class="font-bold text-slate-500 block mb-0.5">Jawaban Siswa:</span>
                   ${escapeHtml(ansText)}
                 </div>
-                <p class="text-[11px] text-emerald-700"><strong>Kunci:</strong> ${escapeHtml(q.sampleAnswer)}</p>
+                <p class="text-[11px] text-emerald-700"><strong>Pedoman Kunci:</strong> ${escapeHtml(q.sampleAnswer)}</p>
               </div>
             `;
           }).join('')}
           <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
             <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
-            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan Nilai Esai</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">Simpan Nilai Esai</button>
           </div>
         </form>
       `);
@@ -3201,19 +3519,242 @@ function doPost(e) {
       showToast(`Nilai esai ${sub.studentName} diperbarui! Nilai akhir: ${sub.totalScore}`);
     }
 
+    /*************************************************************************
+     * FITUR EDIT NILAI LENGKAP PADA DAFTAR NILAI (REQUESTED)
+     *************************************************************************/
+    function openEditNilaiModal(subId) {
+      const sub = appState.submissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      openModal(`
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Edit Nilai & Data Ujian Siswa</h3>
+            <p class="text-xs text-slate-500">${escapeHtml(sub.studentName)} • Kelas ${escapeHtml(sub.kelas)}</p>
+          </div>
+          <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+        </div>
+        <form onsubmit="saveEditedNilai(event, '${sub.id}')" class="p-5 space-y-4 overflow-y-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Nama Siswa</label>
+              <input type="text" id="edit-sub-name" required value="${escapeHtml(sub.studentName)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Kelas</label>
+              <select id="edit-sub-kelas" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white font-semibold">
+                ${CLASSES.map(c => `<option value="${c}" ${c === sub.kelas ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <!-- Skor Komponen -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <p class="text-xs font-bold text-slate-800 uppercase tracking-wider">Komponen Skor Asesmen:</p>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Skor PG (Maks 60)</label>
+                <input type="number" min="0" max="60" id="edit-sub-pg" value="${sub.pgScore}" oninput="updateEditSubTotal()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-center font-bold text-sm bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Skor PGK (Maks 20)</label>
+                <input type="number" min="0" max="20" id="edit-sub-pgk" value="${sub.pgkScore}" oninput="updateEditSubTotal()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-center font-bold text-sm bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Skor Esai (Maks 20)</label>
+                <input type="number" min="0" max="20" id="edit-sub-essay" value="${sub.essayScore}" oninput="updateEditSubTotal()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-center font-bold text-sm bg-white">
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+              <span class="text-xs font-bold text-slate-700">Total Nilai Akhir (0–100):</span>
+              <span id="edit-sub-total-preview" class="text-2xl font-extrabold text-indigo-700">${sub.totalScore}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Percobaan Siswa</label>
+              <select id="edit-sub-attempt" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white font-semibold">
+                <option value="1" ${sub.attemptCount === 1 ? 'selected' : ''}>Percobaan 1 (Bisa Ujian ke-2)</option>
+                <option value="2" ${sub.attemptCount >= 2 ? 'selected' : ''}>Percobaan 2 (Terkunci Selesai)</option>
+                <option value="0" ${sub.attemptCount === 0 ? 'selected' : ''}>Reset ke 0 (Bebas Ujian Ulang)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Durasi Pengerjaan</label>
+              <input type="text" id="edit-sub-duration" value="${escapeHtml(sub.durationUsed || '45 menit')}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm">
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">Simpan Perubahan Nilai</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function updateEditSubTotal() {
+      const pg = Number(document.getElementById('edit-sub-pg')?.value) || 0;
+      const pgk = Number(document.getElementById('edit-sub-pgk')?.value) || 0;
+      const es = Number(document.getElementById('edit-sub-essay')?.value) || 0;
+      const total = Math.min(100, Math.max(0, pg + pgk + es));
+      const el = document.getElementById('edit-sub-total-preview');
+      if (el) el.textContent = total;
+    }
+
+    function saveEditedNilai(e, subId) {
+      e.preventDefault();
+      const sub = appState.submissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      sub.studentName = document.getElementById('edit-sub-name').value.trim();
+      sub.kelas = document.getElementById('edit-sub-kelas').value;
+      sub.pgScore = Math.min(60, Math.max(0, Number(document.getElementById('edit-sub-pg').value) || 0));
+      sub.pgkScore = Math.min(20, Math.max(0, Number(document.getElementById('edit-sub-pgk').value) || 0));
+      sub.essayScore = Math.min(20, Math.max(0, Number(document.getElementById('edit-sub-essay').value) || 0));
+      sub.totalScore = sub.pgScore + sub.pgkScore + sub.essayScore;
+      sub.attemptCount = Number(document.getElementById('edit-sub-attempt').value) || 1;
+      sub.durationUsed = document.getElementById('edit-sub-duration').value.trim();
+
+      // Selaraskan ke Data Siswa jika nama/kelas berubah
+      const st = appState.students.find(s => s.id === sub.studentId);
+      if (st) {
+        st.name = sub.studentName;
+        st.kelas = sub.kelas;
+      }
+
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      closeModal();
+      renderDaftarNilai(document.getElementById('main-view'));
+      showToast(`Data nilai siswa ${sub.studentName} (${sub.kelas}) berhasil diperbarui! Nilai: ${sub.totalScore}`);
+    }
+
+    /*************************************************************************
+     * FITUR HAPUS NILAI TUNGGAL, TERPILIH & PER KELAS (REQUESTED)
+     *************************************************************************/
+    function confirmDeleteSubmission(subId) {
+      const sub = appState.submissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      openModal(`
+        <div class="p-6 text-center space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Hapus Nilai Ujian Siswa?</h3>
+          <p class="text-sm text-slate-600">Nilai milik <strong>${escapeHtml(sub.studentName)} (${escapeHtml(sub.kelas)})</strong> akan dihapus. Status siswa akan kembali menjadi <em>Belum Ujian</em> dan siswa dapat mengerjakan ulang jika diizinkan.</p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="deleteSubmission('${sub.id}'); closeModal();" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Ya, Hapus Nilai</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function deleteSubmission(subId) {
+      const sub = appState.submissions.find(s => s.id === subId);
+      const name = sub ? sub.studentName : 'Siswa';
+      appState.submissions = appState.submissions.filter(s => s.id !== subId);
+      appState.selectedSubmissionIds.delete(subId);
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      renderDaftarNilai(document.getElementById('main-view'));
+      showToast(`Nilai ujian ${name} berhasil dihapus.`);
+    }
+
+    function confirmDeleteSelectedSubmissions() {
+      const count = appState.selectedSubmissionIds.size;
+      if (count === 0) return;
+
+      openModal(`
+        <div class="p-6 text-center space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Hapus ${count} Nilai Ujian Terpilih?</h3>
+          <p class="text-sm text-slate-600">Seluruh lembar nilai siswa yang dicentang akan dihapus permanen dari daftar nilai.</p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="executeDeleteSelectedSubmissions()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Ya, Hapus Terpilih</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeDeleteSelectedSubmissions() {
+      const count = appState.selectedSubmissionIds.size;
+      appState.submissions = appState.submissions.filter(s => !appState.selectedSubmissionIds.has(s.id));
+      appState.selectedSubmissionIds.clear();
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      closeModal();
+      renderDaftarNilai(document.getElementById('main-view'));
+      showToast(`${count} data nilai terpilih berhasil dihapus!`);
+    }
+
+    function openDeleteClassSubmissionsModal(defaultKelas) {
+      const targetCls = defaultKelas === 'ALL' ? '9A' : defaultKelas;
+      openModal(`
+        <div class="p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-rose-700">Hapus Semua Nilai per Kelas</h3>
+            <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+          </div>
+          <p class="text-sm text-slate-600">Pilih kelas yang seluruh data nilai ujiannya ingin dihapus. Data siswa tetap ada dan dapat ujian kembali.</p>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Kelas Sasaran</label>
+            <select id="delete-all-nilai-kelas-select" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white font-semibold">
+              ${CLASSES.map(c => {
+                const cnt = appState.submissions.filter(s => s.kelas === c).length;
+                return `<option value="${c}" ${c === targetCls ? 'selected' : ''}>Kelas ${c} (${cnt} lembar nilai)</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button onclick="closeModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="executeDeleteAllSubmissionsByClass()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Hapus Semua Nilai Kelas Ini</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeDeleteAllSubmissionsByClass() {
+      const cls = document.getElementById('delete-all-nilai-kelas-select').value;
+      const beforeCount = appState.submissions.filter(s => s.kelas === cls).length;
+      if (beforeCount === 0) {
+        showToast(`Tidak ada data nilai untuk kelas ${cls}.`, 'warning');
+        closeModal();
+        return;
+      }
+      appState.submissions = appState.submissions.filter(s => s.kelas !== cls);
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      closeModal();
+      renderDaftarNilai(document.getElementById('main-view'));
+      showToast(`Seluruh ${beforeCount} nilai ujian kelas ${cls} berhasil dihapus!`);
+    }
+
     function exportNilaiCSV() {
       const activeKelas = appState.nilaiKelasFilter;
       const list = activeKelas === 'ALL' ? appState.submissions : appState.submissions.filter(s => s.kelas === activeKelas);
-      const rows = [['Nama Siswa', 'Kelas', 'Skor PG (60)', 'Skor PGK (20)', 'Skor Esai (20)', 'Nilai Akhir', 'Status']];
+      const rows = [['Nama Siswa', 'Kelas', 'Skor PG (60)', 'Skor PGK (20)', 'Skor Esai (20)', 'Nilai Akhir', 'Predikat', 'Status', 'Percobaan']];
       list.forEach(s => {
-        rows.push([s.studentName, s.kelas, s.pgScore, s.pgkScore, s.essayScore, s.totalScore, s.totalScore >= KKTP ? 'Tuntas' : 'Remedial']);
+        const pred = getPredikat(s.totalScore);
+        rows.push([
+          s.studentName, s.kelas, s.pgScore, s.pgkScore, s.essayScore, s.totalScore,
+          pred.label, s.totalScore >= appSettings.kktp ? 'Tuntas' : 'Remedial', s.attemptCount || 1
+        ]);
       });
       const suffix = activeKelas === 'ALL' ? 'Semua_Kelas' : 'Kelas_' + activeKelas;
       downloadCSV(`Daftar_Nilai_Asesmen_Informatika_${suffix}.csv`, rows);
     }
 
     /*************************************************************************
-     * 10. VIEW 6: ANALISIS NILAI & ANALISIS BUTIR SOAL (PER KELAS 9A–9K)
+     * 11. VIEW 6: ANALISIS NILAI & BUTIR SOAL
+     * DILENGKAPI FITUR EDIT SOAL/KUNCI LANGSUNG DARI TABEL, EDIT REKOMENDASI,
+     * ATUR KKTP & KESUKARAN, RESET DATA ANALISIS KELAS, & HAPUS NILAI KOSONG
      *************************************************************************/
     function setAnalisisKelas(cls) {
       appState.analisisKelasFilter = cls;
@@ -3238,6 +3779,9 @@ function doPost(e) {
         ? (scores.length % 2 === 1 ? scores[Math.floor(scores.length / 2)] : ((scores[scores.length / 2 - 1] + scores[scores.length / 2]) / 2).toFixed(1))
         : 0;
 
+      const tuntasCount = subs.filter(s => s.totalScore >= appSettings.kktp).length;
+      const tuntasPct = subs.length ? Math.round((tuntasCount / subs.length) * 100) : 0;
+
       const itemAnalysis = appState.questions.map(q => {
         let totalEarned = 0;
         const maxPerStudent = q.type === 'ESSAY' ? 4 : 2;
@@ -3254,11 +3798,20 @@ function doPost(e) {
             totalEarned += (s.essayScores?.[q.no] ?? 0);
           }
         });
+
         const pct = subs.length ? Math.round((totalEarned / (subs.length * maxPerStudent)) * 100) : 0;
         let difficulty = 'Sedang', diffCls = 'bg-amber-50 text-amber-700', action = 'Dipertahankan';
-        if (subs.length === 0) { difficulty = '-'; diffCls = 'bg-slate-100 text-slate-500'; action = 'Belum ada data'; }
-        else if (pct >= 75) { difficulty = 'Mudah'; diffCls = 'bg-emerald-50 text-emerald-700'; action = 'Baik / Pengayaan'; }
-        else if (pct < 45) { difficulty = 'Sukar'; diffCls = 'bg-rose-50 text-rose-700'; action = 'Perlu Remedial / Evaluasi'; }
+        if (subs.length === 0) {
+          difficulty = '-'; diffCls = 'bg-slate-100 text-slate-500'; action = 'Belum ada data';
+        } else if (pct >= appSettings.diffEasy) {
+          difficulty = 'Mudah'; diffCls = 'bg-emerald-50 text-emerald-700'; action = 'Baik / Pengayaan';
+        } else if (pct < appSettings.diffHard) {
+          difficulty = 'Sukar'; diffCls = 'bg-rose-50 text-rose-700'; action = 'Perlu Remedial / Evaluasi Kunci';
+        }
+
+        const customRec = appSettings.customRecommendations?.[q.no];
+        if (customRec) action = customRec;
+
         return { ...q, pct, difficulty, diffCls, action };
       });
       window._lastItemAnalysis = itemAnalysis;
@@ -3277,84 +3830,120 @@ function doPost(e) {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
             <h2 class="text-2xl font-extrabold text-slate-900">Analisis Nilai & Butir Soal ${activeKelas === 'ALL' ? '(9A–9K)' : 'Kelas ' + activeKelas}</h2>
-            <p class="text-sm text-slate-500 mt-0.5">Evaluasi daya serap siswa per level kognitif, tingkat kesukaran, dan rekomendasi tiap kelas</p>
+            <p class="text-sm text-slate-500 mt-0.5">Daya serap per level kognitif & analisis 45 butir soal. Dilengkapi edit kunci langsung dan kustom rekomendasi.</p>
           </div>
-          <button onclick="exportAnalisisCSV()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition self-start sm:self-auto">
-            Unduh Analisis ${activeKelas === 'ALL' ? 'Semua' : activeKelas} (CSV)
-          </button>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="openSettingsModal()" class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Atur KKTP & Kesukaran
+            </button>
+            <button onclick="removeZeroScoreSubmissions()" title="Hapus lembar siswa berskor 0 yang merusak statistik" class="px-3.5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-semibold transition">
+              Bersihkan Skor 0
+            </button>
+            <button onclick="openResetAnalisisKelasModal('${activeKelas}')" class="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Reset Analisis Kelas
+            </button>
+            <button onclick="exportAnalisisCSV()" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition">
+              Unduh CSV
+            </button>
+            <button onclick="window.print()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition">
+              Cetak Analisis
+            </button>
+          </div>
         </div>
 
         ${renderClassTabs(activeKelas, 'setAnalisisKelas', countMap, true)}
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <p class="text-xs font-semibold text-slate-500">Nilai Tertinggi (${activeKelas === 'ALL' ? 'Semua' : activeKelas})</p>
-            <p class="text-3xl font-extrabold text-emerald-600 mt-1">${maxScore}</p>
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+            <p class="text-xs font-semibold text-slate-500">Nilai Tertinggi</p>
+            <p class="text-2xl font-extrabold text-emerald-600 mt-1">${maxScore}</p>
           </div>
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             <p class="text-xs font-semibold text-slate-500">Nilai Terendah</p>
-            <p class="text-3xl font-extrabold text-rose-600 mt-1">${minScore}</p>
+            <p class="text-2xl font-extrabold text-rose-600 mt-1">${minScore}</p>
           </div>
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             <p class="text-xs font-semibold text-slate-500">Rata-Rata (Mean)</p>
-            <p class="text-3xl font-extrabold text-indigo-600 mt-1">${avgScore}</p>
+            <p class="text-2xl font-extrabold text-indigo-600 mt-1">${avgScore}</p>
           </div>
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             <p class="text-xs font-semibold text-slate-500">Nilai Tengah (Median)</p>
-            <p class="text-3xl font-extrabold text-slate-800 mt-1">${median}</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-1">${median}</p>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs col-span-2 sm:col-span-1">
+            <p class="text-xs font-semibold text-slate-500">Ketuntasan (≥ ${appSettings.kktp})</p>
+            <p class="text-2xl font-extrabold text-amber-600 mt-1">${tuntasPct}% <span class="text-xs font-normal text-slate-500">(${tuntasCount}/${subs.length})</span></p>
           </div>
         </div>
 
         <!-- Grafik Analisis -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-            <h3 class="text-base font-bold text-slate-900">Daya Serap per Level Kognitif (%)</h3>
-            <p class="text-xs text-slate-500 mb-4">Rata-rata penguasaan materi pada soal C1–C4</p>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs print-card">
+            <h3 class="text-base font-bold text-slate-900">Daya Serap per Level Kognitif Bloom (%)</h3>
+            <p class="text-xs text-slate-500 mb-4">Rata-rata penguasaan materi pada butir soal C1–C4</p>
             <div class="h-60"><canvas id="chart-analisis-bloom"></canvas></div>
           </div>
-          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs print-card">
             <h3 class="text-base font-bold text-slate-900">Daya Serap per Bentuk Soal (%)</h3>
-            <p class="text-xs text-slate-500 mb-4">Perbandingan capaian pada PG, PG Kompleks, dan Esai</p>
+            <p class="text-xs text-slate-500 mb-4">Perbandingan capaian pada PG (1-30), PGK (31-40), dan Esai (41-45)</p>
             <div class="h-60"><canvas id="chart-analisis-type"></canvas></div>
           </div>
         </div>
 
-        <!-- Tabel Analisis 45 Butir Soal -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-          <div class="p-5 border-b border-slate-100">
-            <h3 class="text-base font-bold text-slate-900">Analisis Butir Soal (No. 1–45) — ${activeKelas === 'ALL' ? 'Semua Kelas' : 'Kelas ' + activeKelas}</h3>
-            <p class="text-xs text-slate-500">Berdasarkan ${subs.length} lembar jawaban siswa yang telah masuk</p>
+        <!-- Tabel Analisis 45 Butir Soal dengan Fitur Edit Soal & Edit Rekomendasi -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden print-card">
+          <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Analisis Butir Soal (No. 1–45) — ${activeKelas === 'ALL' ? 'Semua Kelas' : 'Kelas ' + activeKelas}</h3>
+              <p class="text-xs text-slate-500">Berdasarkan ${subs.length} lembar jawaban siswa • Klik tombol Edit jika ada kunci/soal yang perlu diperbaiki</p>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 shrink-0">
+              Mudah: ≥ ${appSettings.diffEasy}% • Sukar: &lt; ${appSettings.diffHard}%
+            </span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
                 <tr>
-                  <th class="px-4 py-3 font-semibold text-center w-12">No</th>
-                  <th class="px-4 py-3 font-semibold">Materi</th>
-                  <th class="px-4 py-3 font-semibold text-center">Bentuk</th>
-                  <th class="px-4 py-3 font-semibold text-center">Level</th>
-                  <th class="px-4 py-3 font-semibold">Daya Serap</th>
-                  <th class="px-4 py-3 font-semibold text-center">Kesukaran</th>
-                  <th class="px-4 py-3 font-semibold">Rekomendasi</th>
+                  <th class="px-3 py-3 font-semibold text-center w-10">No</th>
+                  <th class="px-4 py-3 font-semibold">Materi Pokok</th>
+                  <th class="px-3 py-3 font-semibold text-center">Bentuk</th>
+                  <th class="px-3 py-3 font-semibold text-center">Level</th>
+                  <th class="px-4 py-3 font-semibold">Daya Serap (%)</th>
+                  <th class="px-3 py-3 font-semibold text-center">Tingkat Kesukaran</th>
+                  <th class="px-4 py-3 font-semibold">Rekomendasi / Tindak Lanjut</th>
+                  <th class="px-3 py-3 font-semibold text-right no-print">Aksi Perbaikan</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 ${itemAnalysis.map(item => `
                   <tr class="hover:bg-slate-50/70 transition">
-                    <td class="px-4 py-3 text-center font-bold text-slate-700">${item.no}</td>
+                    <td class="px-3 py-3 text-center font-bold text-slate-700">${item.no}</td>
                     <td class="px-4 py-3 font-medium text-slate-900 text-xs sm:text-sm">${escapeHtml(item.materi)}</td>
-                    <td class="px-4 py-3 text-center text-xs font-bold text-slate-600">${item.type}</td>
-                    <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-bold">${item.level}</span></td>
-                    <td class="px-4 py-3 min-w-[140px]">
+                    <td class="px-3 py-3 text-center text-xs font-bold text-slate-600">${item.type}</td>
+                    <td class="px-3 py-3 text-center"><span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-bold">${item.level}</span></td>
+                    <td class="px-4 py-3 min-w-[130px]">
                       <div class="flex items-center gap-2">
                         <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div class="h-2 rounded-full ${item.pct >= 75 ? 'bg-emerald-500' : item.pct >= 45 ? 'bg-amber-500' : 'bg-rose-500'}" style="width:${item.pct}%"></div>
+                          <div class="h-2 rounded-full ${item.pct >= appSettings.diffEasy ? 'bg-emerald-500' : item.pct >= appSettings.diffHard ? 'bg-amber-500' : 'bg-rose-500'}" style="width:${item.pct}%"></div>
                         </div>
                         <span class="text-xs font-bold text-slate-700 w-9 text-right">${item.pct}%</span>
                       </div>
                     </td>
-                    <td class="px-4 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${item.diffCls}">${item.difficulty}</span></td>
-                    <td class="px-4 py-3 text-xs text-slate-600">${item.action}</td>
+                    <td class="px-3 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${item.diffCls}">${item.difficulty}</span></td>
+                    <td class="px-4 py-3 text-xs text-slate-700">
+                      <span class="font-medium">${escapeHtml(item.action)}</span>
+                    </td>
+                    <td class="px-3 py-3 text-right whitespace-nowrap space-x-1 no-print">
+                      <button onclick="openEditQuestionModal(${item.no}, 'analisis')" title="Perbaiki soal atau kunci jawaban nomor ini" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
+                        Edit Soal/Kunci
+                      </button>
+                      <button onclick="openEditRekomendasiModal(${item.no})" title="Kustomisasi tindak lanjut butir soal ini" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+                        Catatan
+                      </button>
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -3388,21 +3977,202 @@ function doPost(e) {
       }
     }
 
+    function openEditRekomendasiModal(qNo) {
+      const q = appState.questions.find(item => item.no === qNo);
+      if (!q) return;
+      const current = appSettings.customRecommendations?.[qNo] || '';
+
+      openModal(`
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-slate-900">Catatan Rekomendasi No. ${qNo}</h3>
+          <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+        </div>
+        <form onsubmit="saveEditedRekomendasi(event, ${qNo})" class="p-5 space-y-4">
+          <div>
+            <p class="text-xs font-bold text-slate-500 mb-1">Materi: ${escapeHtml(q.materi)} (${q.type})</p>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Tindak Lanjut / Catatan Guru</label>
+            <textarea id="edit-rec-text" rows="3" placeholder="Contoh: Perlu pembahasan khusus pada pertemuan remedial hari Kamis..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">${escapeHtml(current)}</textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            ${current ? `<button type="button" onclick="deleteCustomRekomendasi(${qNo})" class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold">Hapus Kustom</button>` : ''}
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan Catatan</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function saveEditedRekomendasi(e, qNo) {
+      e.preventDefault();
+      const text = document.getElementById('edit-rec-text').value.trim();
+      if (!appSettings.customRecommendations) appSettings.customRecommendations = {};
+      if (text) {
+        appSettings.customRecommendations[qNo] = text;
+      } else {
+        delete appSettings.customRecommendations[qNo];
+      }
+      saveSettings();
+      closeModal();
+      renderAnalisisNilai(document.getElementById('main-view'));
+      showToast(`Rekomendasi soal no. ${qNo} berhasil disimpan!`);
+    }
+
+    function deleteCustomRekomendasi(qNo) {
+      if (appSettings.customRecommendations && appSettings.customRecommendations[qNo]) {
+        delete appSettings.customRecommendations[qNo];
+        saveSettings();
+      }
+      closeModal();
+      renderAnalisisNilai(document.getElementById('main-view'));
+      showToast(`Rekomendasi soal no. ${qNo} dikembalikan ke default.`);
+    }
+
+    function openSettingsModal() {
+      openModal(`
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Pengaturan Analisis & KKTP</h3>
+            <p class="text-xs text-slate-500">Sesuaikan kriteria ketuntasan madrasah dan ambang batas kesukaran soal</p>
+          </div>
+          <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+        </div>
+        <form onsubmit="saveSettingsModal(event)" class="p-5 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nilai Kriteria Ketercapaian Tujuan Pembelajaran (KKTP)</label>
+            <input type="number" id="setting-kktp" min="50" max="100" required value="${appSettings.kktp}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold focus:ring-2 focus:ring-indigo-500">
+            <p class="text-[11px] text-slate-400 mt-1">Siswa dengan nilai &ge; KKTP dinyatakan Tuntas, di bawah KKTP masuk Remedial.</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Ambang Soal Mudah (&ge; %)</label>
+              <input type="number" id="setting-diff-easy" min="50" max="95" required value="${appSettings.diffEasy}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-center focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Ambang Soal Sukar (&lt; %)</label>
+              <input type="number" id="setting-diff-hard" min="10" max="60" required value="${appSettings.diffHard}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-center focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">PIN Akses Panel Guru</label>
+            <input type="text" id="setting-teacher-pin" required value="${escapeHtml(appSettings.teacherPin)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-mono font-bold focus:ring-2 focus:ring-indigo-500">
+            <p class="text-[11px] text-slate-400 mt-1">PIN digunakan saat berpindah dari mode ujian HP siswa ke dashboard guru.</p>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">Simpan Pengaturan</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function saveSettingsModal(e) {
+      e.preventDefault();
+      const kktp = Number(document.getElementById('setting-kktp').value) || 75;
+      const diffEasy = Number(document.getElementById('setting-diff-easy').value) || 75;
+      const diffHard = Number(document.getElementById('setting-diff-hard').value) || 45;
+      const teacherPin = document.getElementById('setting-teacher-pin').value.trim() || 'F134nto';
+
+      appSettings.kktp = kktp;
+      appSettings.diffEasy = diffEasy;
+      appSettings.diffHard = diffHard;
+      appSettings.teacherPin = teacherPin;
+      saveSettings();
+      closeModal();
+      if (appState.activeTab === 'analisis') renderAnalisisNilai(document.getElementById('main-view'));
+      else if (appState.activeTab === 'dashboard') renderDashboard(document.getElementById('main-view'));
+      else if (appState.activeTab === 'nilai') renderDaftarNilai(document.getElementById('main-view'));
+      showToast('Pengaturan KKTP & parameter analisis berhasil diperbarui!');
+    }
+
+    function removeZeroScoreSubmissions() {
+      const zeros = appState.submissions.filter(s => s.totalScore === 0);
+      if (zeros.length === 0) {
+        showToast('Tidak ada lembar jawaban siswa yang bernilai 0.', 'info');
+        return;
+      }
+      openModal(`
+        <div class="p-6 text-center space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">🧹</div>
+          <h3 class="text-lg font-bold text-slate-900">Bersihkan ${zeros.length} Nilai Kosong (Skor 0)?</h3>
+          <p class="text-sm text-slate-600">Lembar jawaban berskor 0 biasanya berasal dari siswa yang keluar sebelum menjawab. Menghapusnya membuat analisis butir soal lebih akurat.</p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="executeRemoveZeroScoreSubmissions()" class="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold">Ya, Bersihkan</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeRemoveZeroScoreSubmissions() {
+      const before = appState.submissions.length;
+      appState.submissions = appState.submissions.filter(s => s.totalScore > 0);
+      const removed = before - appState.submissions.length;
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      closeModal();
+      renderAnalisisNilai(document.getElementById('main-view'));
+      showToast(`${removed} data bernilai 0 berhasil dibersihkan!`);
+    }
+
+    function openResetAnalisisKelasModal(defaultKelas) {
+      const targetCls = defaultKelas === 'ALL' ? '9A' : defaultKelas;
+      openModal(`
+        <div class="p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-rose-700">Reset Data Analisis Kelas</h3>
+            <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+          </div>
+          <p class="text-sm text-slate-600">Pilih kelas yang data ujiannya ingin direset dari analisis. Siswa pada kelas tersebut akan diizinkan ujian ulang.</p>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Kelas</label>
+            <select id="reset-analisis-kelas-select" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white font-semibold">
+              ${CLASSES.map(c => {
+                const cnt = appState.submissions.filter(s => s.kelas === c).length;
+                return `<option value="${c}" ${c === targetCls ? 'selected' : ''}>Kelas ${c} (${cnt} hasil ujian)</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button onclick="closeModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Batal</button>
+            <button onclick="executeResetAnalisisKelas()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Reset Data Kelas Ini</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeResetAnalisisKelas() {
+      const cls = document.getElementById('reset-analisis-kelas-select').value;
+      const beforeCount = appState.submissions.filter(s => s.kelas === cls).length;
+      if (beforeCount === 0) {
+        showToast(`Tidak ada data hasil ujian untuk kelas ${cls}.`, 'warning');
+        closeModal();
+        return;
+      }
+      appState.submissions = appState.submissions.filter(s => s.kelas !== cls);
+      saveState();
+      cloudPost({ action: 'saveSubmissions', submissions: appState.submissions, questionsMeta: getQuestionsMeta() }, true);
+      closeModal();
+      renderAnalisisNilai(document.getElementById('main-view'));
+      showToast(`Data analisis kelas ${cls} berhasil direset! (${beforeCount} lembar dihapus).`);
+    }
+
     function exportAnalisisCSV() {
       const activeKelas = appState.analisisKelasFilter;
       const rows = [['No', 'Kelas', 'Materi', 'Bentuk', 'Level', 'Daya Serap (%)', 'Tingkat Kesukaran', 'Rekomendasi']];
       (window._lastItemAnalysis || []).forEach(i => {
-        rows.push([i.no, activeKelas === 'ALL' ? '9A-9K' : activeKelas, i.materi, i.type, i.level, i.pct, i.difficulty, i.action]);
+        rows.push([i.no, activeKelas === 'ALL' ? '9A-9K' : activeKelas, i.materi, i.type, i.level, i.pct + '%', i.difficulty, i.action]);
       });
       const suffix = activeKelas === 'ALL' ? 'Semua_Kelas' : 'Kelas_' + activeKelas;
       downloadCSV(`Analisis_Butir_Soal_Asesmen_Informatika_${suffix}.csv`, rows);
     }
 
     /*************************************************************************
-     * 11. MODE UJIAN SISWA (LOGIN AWAL -> HALAMAN SOAL & KISI-KISI SAJA)
+     * 12. MODE UJIAN SISWA (HP): ANTI-DATA LOSS, AUTO-SAVE SESSION,
+     * FULLSCREEN, 2 PERCOBAAN & TERKUNCI OTOMATIS
      *************************************************************************/
-    const TEACHER_PIN = 'F134nto';
-
     function hashStringToSeed(str) {
       let h = 2166136261 >>> 0;
       for (let i = 0; i < str.length; i++) {
@@ -3432,10 +4202,6 @@ function doPost(e) {
       return arr;
     }
 
-    // Mengacak urutan soal secara konsisten berdasarkan Nama + Kelas siswa:
-    // - Nama & kelas berbeda -> urutan soal berbeda
-    // - Siswa yang sama login ke-2 kali -> urutan soal tetap sama
-    // - No. 1–30 tetap PG, No. 31–40 tetap PGK, No. 41–45 tetap Esai
     function buildStudentQuestionOrder(studentName, kelas) {
       const seedKey = `${String(studentName || '').trim().toLowerCase()}|${String(kelas || '').trim().toUpperCase()}`;
       const rng = createSeededRng(hashStringToSeed(seedKey));
@@ -3469,14 +4235,83 @@ function doPost(e) {
       previousSubmission: null
     };
 
-    const MAX_ATTEMPTS = 2;
-
     function findExistingSubmission(studentId, studentName, kelas) {
       const cleanName = String(studentName || '').trim().toLowerCase();
       return appState.submissions.find(s =>
         (studentId && s.studentId === studentId) ||
         (String(s.studentName || '').trim().toLowerCase() === cleanName && s.kelas === kelas)
       );
+    }
+
+    function autoSaveExamSession() {
+      if (examState.phase !== 'running') return;
+      try {
+        const sessionData = {
+          studentId: examState.studentId,
+          studentName: examState.studentName,
+          kelas: examState.kelas,
+          attemptNumber: examState.attemptNumber,
+          currentIndex: examState.currentIndex,
+          answers: examState.answers,
+          flagged: examState.flagged,
+          remainingSeconds: examState.remainingSeconds,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(EXAM_SESSION_KEY, JSON.stringify(sessionData));
+      } catch (e) {}
+    }
+
+    function clearExamSession() {
+      try { localStorage.removeItem(EXAM_SESSION_KEY); } catch (e) {}
+    }
+
+    function checkActiveExamSession() {
+      try {
+        const raw = localStorage.getItem(EXAM_SESSION_KEY);
+        if (raw) {
+          const session = JSON.parse(raw);
+          if (session && session.studentName && session.remainingSeconds > 10) {
+            return session;
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function resumeActiveExamSession(session) {
+      examState.studentId = session.studentId;
+      examState.studentName = session.studentName;
+      examState.kelas = session.kelas;
+      examState.attemptNumber = session.attemptNumber || 1;
+      examState.currentIndex = session.currentIndex || 0;
+      examState.answers = session.answers || {};
+      examState.flagged = session.flagged || {};
+      examState.remainingSeconds = session.remainingSeconds || (90 * 60);
+      examState.questionOrder = buildStudentQuestionOrder(session.studentName, session.kelas);
+      examState.phase = 'running';
+      examState.studentTab = 'soal';
+      examState.showNavGrid = false;
+      startExamTimer();
+      renderStudentExam();
+      showToast(`Sesi ujian ${session.studentName} berhasil dipulihkan! Jawaban aman tersimpan.`);
+    }
+
+    // Peringatan jika siswa tidak sengaja menutup tab saat ujian berlangsung
+    window.addEventListener('beforeunload', (e) => {
+      if (examState.phase === 'running') {
+        autoSaveExamSession();
+        e.preventDefault();
+        e.returnValue = 'Ujian sedang berjalan! Jawaban Anda telah tersimpan otomatis.';
+        return e.returnValue;
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
     }
 
     function openStudentExamMode(preselectStudentId = '') {
@@ -3512,7 +4347,7 @@ function doPost(e) {
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-lg font-bold text-slate-900">Akses Panel Guru</h3>
-              <p class="text-xs text-slate-500">Masukkan PIN Guru untuk membuka Dashboard, Data Siswa, Nilai & Analisis</p>
+              <p class="text-xs text-slate-500">Masukkan PIN Guru untuk membuka Dashboard & Pengelolaan Nilai</p>
             </div>
             <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
           </div>
@@ -3534,7 +4369,8 @@ function doPost(e) {
     function verifyTeacherPin(e) {
       e.preventDefault();
       const pin = document.getElementById('teacher-pin-input').value.trim();
-      if (pin !== TEACHER_PIN) {
+      const expectedPin = appSettings.teacherPin || 'F134nto';
+      if (pin !== expectedPin) {
         showToast('PIN Guru salah! Silakan periksa kembali.', 'error');
         return;
       }
@@ -3544,10 +4380,6 @@ function doPost(e) {
       document.getElementById('teacher-app').classList.remove('hidden');
       switchTab(appState.activeTab || 'dashboard');
       showToast('Berhasil masuk ke Panel Guru.');
-    }
-
-    function closeStudentExamMode() {
-      openStudentExamMode();
     }
 
     function switchStudentTab(tab) {
@@ -3584,11 +4416,11 @@ function doPost(e) {
       });
 
       return `
-        <div class="flex-1 p-4 sm:p-6 space-y-4">
-          <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-sm space-y-3">
+        <div class="flex-1 p-4 sm:p-6 space-y-4 pb-24">
+          <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3">
             <div>
               <h3 class="text-base font-extrabold text-slate-900">Kisi-Kisi Asesmen Informatika IX</h3>
-              <p class="text-xs text-slate-500 mt-0.5">45 Indikator Soal (30 PG, 10 PGK 2 Jawaban, 5 Esai)</p>
+              <p class="text-xs text-slate-500 mt-0.5">45 Indikator Soal (30 PG, 10 PGK, 5 Esai)</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-2">
               <input type="text" value="${escapeHtml(examState.kisiSearch)}" oninput="examState.kisiSearch=this.value; renderStudentExam()" placeholder="Cari nomor atau materi kisi-kisi..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -3607,7 +4439,7 @@ function doPost(e) {
             </div>
           </div>
 
-          <div class="space-y-2.5 pb-6">
+          <div class="space-y-2.5">
             ${filtered.length === 0 ? `
               <div class="bg-white rounded-2xl p-6 text-center text-xs text-slate-400 border border-slate-200">Tidak ada indikator kisi-kisi yang cocok.</div>
             ` : filtered.map(q => {
@@ -3637,6 +4469,7 @@ function doPost(e) {
 
     function renderStudentExam() {
       const root = document.getElementById('student-exam-app');
+      const activeSession = checkActiveExamSession();
 
       if (examState.phase === 'login') {
         root.innerHTML = `
@@ -3646,22 +4479,43 @@ function doPost(e) {
                 <div class="px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-200 mb-3">
                   <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">MTs Ma'arif NU 1 Wangon</h1>
                 </div>
-                <span class="inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold mb-2">Login Peserta Didik</span>
+                <span class="inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold mb-2">Penilaian Berbasis HP Siswa</span>
                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">Asesmen Informatika Kelas IX</h2>
                 <p class="text-xs text-slate-500 mt-1">30 PG • 10 PGK (2 Jawaban) • 5 Esai • 90 Menit</p>
               </div>
 
+              ${activeSession ? `
+                <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 space-y-2">
+                  <div class="flex items-center gap-2 text-emerald-800">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <p class="text-xs font-bold uppercase tracking-wider">Sesi Ujian Sedang Berjalan Ditemukan</p>
+                  </div>
+                  <p class="text-xs text-emerald-950 font-semibold leading-relaxed">
+                    Peserta: <strong>${escapeHtml(activeSession.studentName)} (${escapeHtml(activeSession.kelas)})</strong><br>
+                    Waktu tersisa: <strong>${formatTimer(activeSession.remainingSeconds)}</strong> • Terjawab: <strong>${Object.keys(activeSession.answers || {}).length}/45 soal</strong>
+                  </p>
+                  <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="resumeActiveExamSession(JSON.parse(localStorage.getItem('${EXAM_SESSION_KEY}')))" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+                      Lanjutkan Ujian Ini →
+                    </button>
+                    <button type="button" onclick="clearExamSession(); renderStudentExam();" class="px-3 py-2.5 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs transition">
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              ` : ''}
+
               <form onsubmit="startStudentExam(event)" class="space-y-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Kelas (9A–9K)</label>
+                  <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Kelas Kamu (9A–9K)</label>
                   <select id="exam-student-kelas" onchange="syncStudentDropdownByClass(this.value)" class="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm bg-white font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     ${CLASSES.map(c => `<option value="${c}" ${c === examState.kelas ? 'selected' : ''}>Kelas ${c}</option>`).join('')}
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Nama dari Daftar Kelas (Opsional)</label>
+                  <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Nama dari Daftar Siswa (Opsional)</label>
                   <select id="exam-student-select" onchange="onSelectExamStudent(this.value)" class="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    <option value="">-- Atau ketik nama lengkap di bawah --</option>
+                    <option value="">-- Atau ketik nama lengkap kamu di bawah --</option>
                     ${appState.students.filter(s => s.kelas === examState.kelas).map(s => {
                       const exSub = findExistingSubmission(s.id, s.name, s.kelas);
                       const att = exSub ? (Number(exSub.attemptCount) || 1) : 0;
@@ -3675,14 +4529,14 @@ function doPost(e) {
                   <input type="text" id="exam-student-name" required value="${escapeHtml(examState.studentName)}" placeholder="Masukkan nama lengkap kamu..." class="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <button type="submit" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-200 transition">
-                  Masuk ke Halaman Soal & Kisi-Kisi →
+                  Mulai Kerjakan Soal Ujian →
                 </button>
               </form>
 
               <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
                 <span class="flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full ${cloudState.url ? 'bg-emerald-500' : 'bg-slate-300'}"></span>
-                  ${cloudState.url ? 'Cloud Spreadsheet Aktif' : "MTs Ma'arif NU 1 Wangon"}
+                  ${cloudState.url ? 'Google Cloud Aktif' : "MTs Ma'arif NU 1 Wangon"}
                 </span>
                 <button type="button" onclick="openTeacherLoginModal()" class="font-semibold text-slate-500 hover:text-indigo-600 transition">
                   Masuk sebagai Guru
@@ -3700,7 +4554,7 @@ function doPost(e) {
         const currentScore = res.currentAttemptScore;
         const att = res.attemptCount || 1;
         const canRetry = att < MAX_ATTEMPTS;
-        const tuntas = bestScore >= KKTP;
+        const tuntas = bestScore >= appSettings.kktp;
         const syncBadge = !cloudState.url
           ? `<div class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold">Tersimpan di perangkat lokal</div>`
           : examState.cloudSaveStatus === 'saving'
@@ -3708,6 +4562,7 @@ function doPost(e) {
             : examState.cloudSaveStatus === 'saved'
               ? `<div class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-semibold">✓ Nilai tersimpan aman di Google Spreadsheet</div>`
               : `<div class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs font-semibold">Gagal kirim ke Spreadsheet (tersimpan lokal)</div>`;
+
         root.innerHTML = `
           <div class="min-h-screen bg-slate-100 flex items-center justify-center p-4">
             <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 sm:p-8 text-center space-y-5">
@@ -3724,19 +4579,19 @@ function doPost(e) {
               </div>
               ${syncBadge}
               <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
-                <p class="text-xs uppercase tracking-wider text-indigo-100 font-semibold">${att > 1 ? 'Nilai Tertinggi (Masuk Daftar Nilai)' : 'Hasil Nilai Kamu'}</p>
+                <p class="text-xs uppercase tracking-wider text-indigo-100 font-semibold">${att > 1 ? 'Nilai Tertinggi (Tercatat di Daftar Nilai)' : 'Hasil Nilai Kamu'}</p>
                 <p class="text-5xl font-extrabold mt-1">${bestScore}</p>
                 ${att > 1 ? `<p class="text-xs text-indigo-100 mt-1.5">Nilai percobaan ke-2: <strong>${currentScore}</strong></p>` : ''}
-                <p class="text-xs text-indigo-100 mt-2">Status: <strong>${tuntas ? 'TUNTAS (≥ ' + KKTP + ')' : 'PERLU REMEDIAL'}</strong></p>
+                <p class="text-xs text-indigo-100 mt-2">Status: <strong>${tuntas ? 'TUNTAS (≥ ' + appSettings.kktp + ')' : 'PERLU REMEDIAL'}</strong></p>
               </div>
               <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs space-y-1.5 text-left">
                 <p class="font-semibold">
-                  Kesempatan mengerjakan maks. <strong>2x</strong> (nilai tertinggi yang dicatat). Setelah selesai 2x, akun otomatis terkunci.
+                  Kesempatan mengerjakan maksimal <strong>2x</strong> (nilai tertinggi yang disimpan). Setelah selesai 2x, akun otomatis terkunci.
                 </p>
                 <p class="text-amber-700">
                   ${canRetry
-                    ? 'Kamu masih memiliki <strong>1 kesempatan lagi (Percobaan ke-2)</strong> jika ingin memperbaiki nilai.'
-                    : 'Kesempatan ujian (2/2) telah selesai. Nama dan kelas ini sekarang <strong>terkunci</strong> agar tidak disalahgunakan oleh orang lain.'}
+                    ? 'Kamu masih memiliki <strong>1 kesempatan lagi (Percobaan ke-2)</strong> untuk memperbaiki nilai.'
+                    : 'Kesempatan ujian telah selesai. Data telah terkunci demi keamanan.'}
                 </p>
               </div>
               <div class="space-y-2.5">
@@ -3746,7 +4601,7 @@ function doPost(e) {
                   </button>
                 ` : ''}
                 <button onclick="openStudentExamMode()" class="w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition">
-                  Selesai & Kembali ke Login
+                  Selesai & Kembali ke Halaman Awal
                 </button>
               </div>
             </div>
@@ -3755,7 +4610,7 @@ function doPost(e) {
         return;
       }
 
-      // Phase: 'running' -> Hanya menampilkan 2 Halaman: Soal & Kisi-Kisi
+      // Phase: 'running' -> Halaman Ujian Siswa
       const examQuestions = examState.questionOrder.length ? examState.questionOrder : appState.questions;
       const q = examQuestions[examState.currentIndex];
       const displayNo = examState.currentIndex + 1;
@@ -3773,7 +4628,7 @@ function doPost(e) {
 
       root.innerHTML = `
         <div class="min-h-screen flex flex-col bg-slate-100 max-w-2xl mx-auto shadow-xl bg-white sm:my-0">
-          <!-- Sticky Header Ujian -->
+          <!-- Sticky Header Ujian HP -->
           <header class="sticky top-0 z-30 bg-indigo-700 text-white px-4 py-3 shadow-md">
             <div class="flex items-center justify-between gap-2">
               <div class="min-w-0">
@@ -3781,21 +4636,24 @@ function doPost(e) {
                 <p class="text-sm font-extrabold truncate">${escapeHtml(examState.studentName)} <span class="font-normal text-indigo-200">(${escapeHtml(examState.kelas)})</span></p>
               </div>
               <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="toggleFullscreen()" title="Layar Penuh HP" class="p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs">
+                  ⛶
+                </button>
                 <div id="exam-timer-badge" class="px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-xs font-mono text-xs sm:text-sm font-extrabold tracking-wider">
                   ⏱ ${formatTimer(examState.remainingSeconds)}
                 </div>
               </div>
             </div>
 
-            <!-- 2 Tab Khusus Siswa: Soal Ujian & Kisi-Kisi -->
+            <!-- Tab Khusus Siswa: Soal & Kisi-Kisi -->
             <div class="mt-3 grid grid-cols-2 gap-2 bg-indigo-800/60 p-1 rounded-2xl">
               <button onclick="switchStudentTab('soal')" class="py-2 rounded-xl text-xs font-bold transition ${
-                examState.studentTab === 'soal' ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:bg-white/10'
+                examState.studentTab === 'soal' ? 'bg-white text-indigo-700 shadow-xs' : 'text-indigo-100 hover:bg-white/10'
               }">
                 Soal Ujian (${answeredCount}/45)
               </button>
               <button onclick="switchStudentTab('kisi')" class="py-2 rounded-xl text-xs font-bold transition ${
-                examState.studentTab === 'kisi' ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:bg-white/10'
+                examState.studentTab === 'kisi' ? 'bg-white text-indigo-700 shadow-xs' : 'text-indigo-100 hover:bg-white/10'
               }">
                 Kisi-Kisi Soal (45)
               </button>
@@ -3815,8 +4673,8 @@ function doPost(e) {
             </div>
 
             <!-- Konten Soal -->
-            <div class="flex-1 p-4 sm:p-6 bg-slate-50 space-y-4">
-              <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-sm space-y-4">
+            <div class="flex-1 p-4 sm:p-6 bg-slate-50 space-y-4 pb-32">
+              <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-sm flex items-center justify-center">${displayNo}</span>
@@ -3837,7 +4695,7 @@ function doPost(e) {
                     ${q.options.map((opt, idx) => {
                       const selected = examState.answers[q.no] === idx;
                       return `
-                        <button type="button" onclick="selectPGAnswer(${q.no}, ${idx})" class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 active:scale-[0.99] ${
+                        <button type="button" onclick="selectPGAnswer(${q.no}, ${idx})" class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 active:scale-[0.99] min-h-[52px] ${
                           selected
                             ? 'bg-indigo-50 border-indigo-600 text-indigo-950 font-semibold shadow-xs'
                             : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-700'
@@ -3852,13 +4710,14 @@ function doPost(e) {
                   </div>
                 ` : q.type === 'PGK' ? `
                   <div class="space-y-2.5 pt-1">
-                    <p class="text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2">
-                      Pilih tepat 2 jawaban benar (${currentPgkAns.length}/2 dipilih)
-                    </p>
+                    <div class="flex items-center justify-between text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2">
+                      <span>Pilih tepat 2 jawaban</span>
+                      <span class="px-2 py-0.5 rounded-md ${currentPgkAns.length === 2 ? 'bg-purple-600 text-white' : 'bg-purple-200 text-purple-800'}">${currentPgkAns.length}/2 dipilih</span>
+                    </div>
                     ${q.options.map((opt, idx) => {
                       const selected = currentPgkAns.includes(idx);
                       return `
-                        <button type="button" onclick="togglePGKAnswer(${q.no}, ${idx})" class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 active:scale-[0.99] ${
+                        <button type="button" onclick="togglePGKAnswer(${q.no}, ${idx})" class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 active:scale-[0.99] min-h-[52px] ${
                           selected
                             ? 'bg-purple-50 border-purple-600 text-purple-950 font-semibold shadow-xs'
                             : 'bg-white border-slate-200 hover:border-purple-300 text-slate-700'
@@ -3873,20 +4732,20 @@ function doPost(e) {
                   </div>
                 ` : `
                   <div class="space-y-2 pt-1">
-                    <label class="block text-xs font-bold text-slate-600">Tulis jawaban esai kamu di bawah ini:</label>
-                    <textarea rows="5" oninput="setEssayAnswer(${q.no}, this.value)" placeholder="Ketik jawaban dengan jelas dan lengkap..." class="w-full p-3.5 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-sm leading-relaxed">${escapeHtml(examState.answers[q.no] || '')}</textarea>
+                    <label class="block text-xs font-bold text-slate-600">Jawaban Esai Siswa (tersimpan otomatis saat diketik):</label>
+                    <textarea rows="5" oninput="setEssayAnswer(${q.no}, this.value)" placeholder="Ketik jawaban kamu di sini..." class="w-full p-3.5 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-sm leading-relaxed">${escapeHtml(examState.answers[q.no] || '')}</textarea>
                   </div>
                 `}
               </div>
 
-              <!-- Panel Navigasi 45 Nomor (Toggleable) -->
+              <!-- Drawer Navigasi Nomor Soal -->
               ${examState.showNavGrid ? `
                 <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm space-y-3">
                   <div class="flex items-center justify-between">
-                    <p class="text-xs font-extrabold text-slate-800">Navigasi Nomor Soal (1–${examQuestions.length})</p>
+                    <p class="text-xs font-extrabold text-slate-800">Daftar Soal 1–${examQuestions.length}</p>
                     <button onclick="toggleNavGrid()" class="text-xs font-bold text-slate-500 hover:text-slate-800">Tutup ✕</button>
                   </div>
-                  <div class="grid grid-cols-9 gap-1.5">
+                  <div class="grid grid-cols-5 sm:grid-cols-9 gap-2">
                     ${examQuestions.map((item, idx) => {
                       const answered = isQuestionAnswered(item);
                       const flagged = !!examState.flagged[item.no];
@@ -3894,8 +4753,8 @@ function doPost(e) {
                       let cls = 'bg-slate-100 text-slate-600 border-slate-200';
                       if (flagged) cls = 'bg-amber-400 text-amber-950 border-amber-500';
                       else if (answered) cls = 'bg-emerald-500 text-white border-emerald-600';
-                      if (active) cls += ' ring-2 ring-indigo-600 ring-offset-1';
-                      return `<button onclick="goToQuestion(${idx})" class="h-8 rounded-lg border text-xs font-bold transition ${cls}">${idx + 1}</button>`;
+                      if (active) cls += ' ring-2 ring-indigo-600 ring-offset-2';
+                      return `<button onclick="goToQuestion(${idx})" class="h-10 rounded-xl border text-xs font-bold transition flex items-center justify-center ${cls}">${idx + 1}</button>`;
                     }).join('')}
                   </div>
                   <div class="flex flex-wrap gap-3 text-[10px] font-semibold text-slate-500 pt-1">
@@ -3907,20 +4766,21 @@ function doPost(e) {
               ` : ''}
             </div>
 
-            <!-- Footer Navigasi Sticky -->
-            <footer class="sticky bottom-0 z-30 bg-white border-t border-slate-200 px-4 py-3 flex items-center justify-between gap-2">
+            <!-- Sticky Bottom Navigation Footer -->
+            <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 max-w-2xl mx-auto flex items-center justify-between gap-2 shadow-lg">
               <button onclick="goToQuestion(${Math.max(0, examState.currentIndex - 1)})" ${examState.currentIndex === 0 ? 'disabled' : ''} class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 text-xs font-bold transition">
-                ← Sebelumnya
+                ← Sebelum
               </button>
-              <button onclick="toggleNavGrid()" class="px-3.5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition">
-                Nomor (${displayNo}/${examQuestions.length})
+              <button onclick="toggleNavGrid()" class="px-3.5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition flex items-center gap-1">
+                <span>Daftar Soal</span>
+                <span class="px-1.5 py-0.5 rounded-md bg-indigo-200 text-indigo-900 text-[10px]">${displayNo}/45</span>
               </button>
               ${examState.currentIndex === examQuestions.length - 1 ? `
-                <button onclick="openFinishExamModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
+                <button onclick="openFinishExamModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition">
                   Kumpulkan ✓
                 </button>
               ` : `
-                <button onclick="goToQuestion(${Math.min(examQuestions.length - 1, examState.currentIndex + 1)})" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition">
+                <button onclick="goToQuestion(${Math.min(examQuestions.length - 1, examState.currentIndex + 1)})" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition">
                   Berikutnya →
                 </button>
               `}
@@ -3959,7 +4819,6 @@ function doPost(e) {
         return;
       }
 
-      // Cari apakah siswa sudah terdaftar di kelas tersebut
       let st = selectedId
         ? appState.students.find(s => s.id === selectedId)
         : appState.students.find(s => s.name.trim().toLowerCase() === name.toLowerCase() && s.kelas === kelas);
@@ -3967,17 +4826,16 @@ function doPost(e) {
       const existingSub = findExistingSubmission(st ? st.id : '', name, kelas);
       const prevAttempts = existingSub ? (Number(existingSub.attemptCount) || 1) : 0;
 
-      // Kunci otomatis jika sudah menyelesaikan 2x kesempatan
       if (prevAttempts >= MAX_ATTEMPTS) {
         openModal(`
           <div class="p-6 text-center space-y-4">
             <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl font-extrabold">🔒</div>
             <h3 class="text-lg font-extrabold text-slate-900">Akses Ujian Terkunci</h3>
             <p class="text-sm text-slate-600">
-              Siswa <strong>${escapeHtml(name)} (${escapeHtml(kelas)})</strong> sudah menyelesaikan <strong>2x kesempatan ujian</strong> dan nilainya telah tercatat. Nama dan kelas ini tidak dapat digunakan lagi untuk mencegah penyalahgunaan.
+              Siswa <strong>${escapeHtml(name)} (${escapeHtml(kelas)})</strong> sudah menyelesaikan <strong>2x kesempatan ujian</strong>. Hubungi guru jika memerlukan ujian ulang perbaikan.
             </p>
             <div class="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-100">
-              <p class="text-xs text-indigo-700 font-semibold">Nilai Tertinggi Tercatat</p>
+              <p class="text-xs text-indigo-700 font-semibold">Nilai Tertinggi Kamu</p>
               <p class="text-3xl font-extrabold text-indigo-700 mt-0.5">${existingSub.totalScore}</p>
             </div>
             <button onclick="closeModal()" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold">Mengerti</button>
@@ -4012,11 +4870,12 @@ function doPost(e) {
       examState.remainingSeconds = 90 * 60;
       examState.showNavGrid = false;
 
+      autoSaveExamSession();
       startExamTimer();
       renderStudentExam();
       showToast(
         examState.attemptNumber === 2
-          ? 'Percobaan ke-2 dimulai! Nilai tertinggi yang akan masuk ke daftar nilai.'
+          ? 'Percobaan ke-2 dimulai! Nilai tertinggi yang akan dicatat di daftar nilai.'
           : 'Selamat mengerjakan Asesmen Informatika!'
       );
     }
@@ -4036,6 +4895,10 @@ function doPost(e) {
             badge.classList.add('bg-rose-600');
           }
         }
+        // Simpan sesi tiap 15 detik
+        if (examState.remainingSeconds % 15 === 0) {
+          autoSaveExamSession();
+        }
         if (examState.remainingSeconds <= 0) {
           clearInterval(examState.timerHandle);
           submitStudentExam(true);
@@ -4046,7 +4909,7 @@ function doPost(e) {
     function retrySecondAttempt() {
       const existingSub = findExistingSubmission(examState.studentId, examState.studentName, examState.kelas);
       if (existingSub && (Number(existingSub.attemptCount) || 1) >= MAX_ATTEMPTS) {
-        showToast('Kesempatan mengerjakan (2/2) sudah habis!', 'warning');
+        showToast('Kesempatan mengerjakan (2/2) sudah selesai!', 'warning');
         return;
       }
       examState.attemptNumber = 2;
@@ -4059,9 +4922,10 @@ function doPost(e) {
       examState.flagged = {};
       examState.remainingSeconds = 90 * 60;
       examState.showNavGrid = false;
+      autoSaveExamSession();
       startExamTimer();
       renderStudentExam();
-      showToast('Percobaan ke-2 dimulai! Nilai tertinggi akan dipilih otomatis.', 'info');
+      showToast('Percobaan ke-2 dimulai! Nilai tertinggi akan otomatis disimpan.', 'info');
     }
 
     function isQuestionAnswered(q) {
@@ -4073,6 +4937,7 @@ function doPost(e) {
 
     function selectPGAnswer(no, idx) {
       examState.answers[no] = idx;
+      autoSaveExamSession();
       renderStudentExam();
     }
 
@@ -4083,21 +4948,24 @@ function doPost(e) {
         curr.splice(pos, 1);
       } else {
         if (curr.length >= 2) {
-          showToast('Soal PG Kompleks maksimal memilih 2 jawaban. Hapus 1 pilihan dulu untuk mengganti.', 'warning');
+          showToast('Maksimal 2 pilihan. Klik salah satu opsi terpilih untuk batal memilih.', 'warning');
           return;
         }
         curr.push(idx);
       }
       examState.answers[no] = curr.sort((a, b) => a - b);
+      autoSaveExamSession();
       renderStudentExam();
     }
 
     function setEssayAnswer(no, val) {
       examState.answers[no] = val;
+      autoSaveExamSession();
     }
 
     function toggleFlagQuestion(no) {
       examState.flagged[no] = !examState.flagged[no];
+      autoSaveExamSession();
       renderStudentExam();
     }
 
@@ -4109,6 +4977,7 @@ function doPost(e) {
     function goToQuestion(idx) {
       examState.currentIndex = idx;
       examState.showNavGrid = false;
+      autoSaveExamSession();
       renderStudentExam();
       const root = document.getElementById('student-exam-app');
       if (root) root.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4120,14 +4989,14 @@ function doPost(e) {
       openModal(`
         <div class="p-6 text-center space-y-4">
           <div class="w-12 h-12 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-extrabold">✓</div>
-          <h3 class="text-lg font-extrabold text-slate-900">Kumpulkan Jawaban?</h3>
+          <h3 class="text-lg font-extrabold text-slate-900">Kumpulkan Jawaban Ujian?</h3>
           <p class="text-sm text-slate-600">
-            Kamu telah menjawab <strong>${answeredCount} dari 45 soal</strong>.
-            ${unanswered > 0 ? `<span class="text-rose-600 font-semibold block mt-1">Masih ada ${unanswered} soal yang belum terjawab lengkap.</span>` : 'Semua soal sudah terjawab!'}
+            Kamu telah menjawab <strong>${answeredCount} dari 45 butir soal</strong>.
+            ${unanswered > 0 ? `<span class="text-rose-600 font-semibold block mt-1">Perhatian: Masih ada ${unanswered} soal yang belum terjawab lengkap.</span>` : 'Semua soal sudah terjawab lengkap!'}
           </p>
           <div class="flex gap-3 pt-2">
             <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Periksa Lagi</button>
-            <button onclick="closeModal(); submitStudentExam(false);" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold">Ya, Kumpulkan</button>
+            <button onclick="closeModal(); submitStudentExam(false);" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-xs">Ya, Kumpulkan</button>
           </div>
         </div>
       `);
@@ -4135,8 +5004,8 @@ function doPost(e) {
 
     async function submitStudentExam(autoSubmit = false) {
       clearInterval(examState.timerHandle);
+      clearExamSession();
 
-      // Hitung skor PG (60), PGK (20), dan estimasi otomatis Esai (20)
       let pgScore = 0, pgkScore = 0, essayScore = 0;
       const essayScores = {};
 
@@ -4180,14 +5049,12 @@ function doPost(e) {
         attemptCount: examState.attemptNumber
       };
 
-      // Cek apakah sudah ada percobaan sebelumnya -> pilih NILAI TERTINGGI
       const existingIdx = appState.submissions.findIndex(s => s.studentId === examState.studentId);
       let finalSavedSub = newSub;
 
       if (existingIdx >= 0) {
         const prev = appState.submissions[existingIdx];
         if (prev.totalScore > currentAttemptScore) {
-          // Pertahankan skor tertinggi dari percobaan 1, hanya naikkan attemptCount ke 2
           prev.attemptCount = MAX_ATTEMPTS;
           finalSavedSub = prev;
         } else {
@@ -4216,7 +5083,6 @@ function doPost(e) {
         showToast('Waktu ujian habis! Jawaban otomatis dikumpulkan.', 'warning');
       }
 
-      // Kirim otomatis ke Google Spreadsheet jika terhubung
       if (cloudState.url) {
         const stObj = appState.students.find(s => s.id === examState.studentId);
         const res = await cloudPost({
@@ -4231,11 +5097,15 @@ function doPost(e) {
     }
 
     /*************************************************************************
-     * 12. INISIALISASI APLIKASI
+     * 13. INISIALISASI APLIKASI
      *************************************************************************/
     initCloudConfig();
     loadState();
+
+    // Periksa jika ada sesi ujian aktif yang belum selesai di HP siswa
+    const pendingSession = checkActiveExamSession();
     openStudentExamMode();
+
     if (cloudState.url) {
       syncPullFromSheet(true);
     }
