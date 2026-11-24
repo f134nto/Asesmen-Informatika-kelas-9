@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -98,6 +98,10 @@
 
       <!-- Tombol Mode Ujian HP & Spreadsheet -->
       <div class="p-4 border-t border-slate-800 space-y-2.5">
+        <button id="sidebar-save-btn" onclick="manualSaveAllData()" class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2" title="Simpan data lokal & sinkronkan ke Google Spreadsheet">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span id="sidebar-save-label">Simpan Perubahan Data</span>
+        </button>
         <button onclick="openSpreadsheetModal()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-semibold text-xs transition flex items-center justify-between gap-2">
           <span class="flex items-center gap-2">
             <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -109,7 +113,11 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
           Mode Ujian Siswa (HP)
         </button>
-        <div class="text-[11px] text-slate-400 text-center">
+        <button onclick="logoutTeacher()" class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-rose-950/60 hover:text-rose-300 border border-slate-700/80 text-slate-300 font-semibold text-xs transition flex items-center justify-center gap-2" title="Kunci Dashboard Guru dan keluar">
+          <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Logout Guru</span>
+        </button>
+        <div class="text-[11px] text-slate-400 text-center pt-1">
           Penyusun: <span class="text-slate-200 font-semibold">Fitrianto Puji Pangarso, S.Kom</span>
         </div>
       </div>
@@ -129,6 +137,10 @@
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
+          <button id="topbar-save-btn" onclick="manualSaveAllData()" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5" title="Simpan data lokal & sinkronkan ke Google Spreadsheet">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            <span id="topbar-save-label" class="hidden sm:inline">Simpan Data</span>
+          </button>
           <button id="topbar-sync-btn" onclick="openSpreadsheetModal()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5">
             <span id="topbar-sync-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
             <span id="topbar-sync-label" class="hidden sm:inline">Spreadsheet: Lokal</span>
@@ -143,6 +155,10 @@
           <button onclick="openStudentExamMode()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
             <span class="hidden sm:inline">Login Siswa (HP)</span>
+          </button>
+          <button onclick="logoutTeacher()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 text-xs font-semibold transition flex items-center gap-1" title="Kunci Dashboard Guru dan keluar">
+            <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span class="hidden md:inline">Logout Guru</span>
           </button>
         </div>
       </header>
@@ -1821,6 +1837,105 @@ function doPost(e) {
         if (!silent) showToast('Gagal menarik data: ' + err.message, 'error');
         return false;
       }
+    }
+
+    async function manualSaveAllData() {
+      const topbarBtn = document.getElementById('topbar-save-btn');
+      const sidebarBtn = document.getElementById('sidebar-save-btn');
+      const topbarLabel = document.getElementById('topbar-save-label');
+      const sidebarLabel = document.getElementById('sidebar-save-label');
+
+      if (topbarLabel) topbarLabel.textContent = 'Menyimpan...';
+      if (sidebarLabel) sidebarLabel.textContent = 'Menyimpan...';
+      if (topbarBtn) topbarBtn.disabled = true;
+      if (sidebarBtn) sidebarBtn.disabled = true;
+
+      // 1. Simpan ke local storage
+      saveState();
+
+      let cloudSuccess = false;
+      let cloudMsg = '';
+
+      // 2. Sinkronkan ke Google Spreadsheet jika URL aktif
+      if (cloudState.url) {
+        try {
+          const res = await syncPushAllToSheet(true);
+          if (res && res.ok) {
+            cloudSuccess = true;
+          } else {
+            cloudMsg = (res && res.error) ? res.error : 'Koneksi spreadsheet tertunda';
+          }
+        } catch (e) {
+          cloudMsg = e.message || 'Gagal sinkron';
+        }
+      }
+
+      // Beri efek visual sukses
+      if (topbarLabel) topbarLabel.textContent = 'Tersimpan! ✓';
+      if (sidebarLabel) sidebarLabel.textContent = 'Tersimpan! ✓';
+      if (topbarBtn) {
+        topbarBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        topbarBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      }
+      if (sidebarBtn) {
+        sidebarBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+        sidebarBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+      }
+
+      if (cloudState.url) {
+        if (cloudSuccess) {
+          showToast('✓ Data berhasil disimpan ke penyimpanan lokal & disinkronkan ke Google Spreadsheet!', 'success');
+        } else {
+          showToast(`Data aman disimpan di perangkat lokal. (${cloudMsg})`, 'warning');
+        }
+      } else {
+        showToast('✓ Seluruh perubahan data berhasil disimpan dengan aman di penyimpanan lokal!', 'success');
+      }
+
+      setTimeout(() => {
+        if (topbarLabel) topbarLabel.textContent = 'Simpan Data';
+        if (sidebarLabel) sidebarLabel.textContent = 'Simpan Perubahan Data';
+        if (topbarBtn) {
+          topbarBtn.disabled = false;
+          topbarBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+          topbarBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        }
+        if (sidebarBtn) {
+          sidebarBtn.disabled = false;
+          sidebarBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+          sidebarBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+        }
+      }, 1600);
+
+      // Refresh tampilan tab saat ini
+      if (appState.activeTab) {
+        switchTab(appState.activeTab);
+      }
+    }
+
+    function logoutTeacher() {
+      openModal(`
+        <div class="p-6 text-center space-y-4">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </div>
+          <h3 class="text-lg font-extrabold text-slate-900">Logout dari Dashboard Guru?</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Dashboard Guru akan dikunci dan aplikasi kembali ke layar Login Siswa (HP). Anda memerlukan PIN Guru (<strong>${escapeHtml(appSettings.teacherPin || 'F134nto')}</strong>) untuk masuk kembali.
+          </p>
+          <div class="flex gap-2.5 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">Batal</button>
+            <button onclick="executeTeacherLogout()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold transition shadow-xs">Ya, Logout Guru</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function executeTeacherLogout() {
+      closeModal();
+      saveState();
+      openStudentExamMode();
+      showToast('Dashboard Guru dikunci. Anda telah logout.', 'info');
     }
 
     async function syncPushAllToSheet(silent = false) {
@@ -4217,6 +4332,7 @@ function doPost(e) {
 
     let examState = {
       phase: 'login', // 'login' | 'running' | 'result'
+      isReadOnly: false, // true jika siswa sudah selesai kirim jawaban 2x (hanya lihat soal & kisi-kisi)
       studentTab: 'soal', // 'soal' | 'kisi'
       kisiSearch: '',
       kisiType: 'ALL',
@@ -4319,6 +4435,7 @@ function doPost(e) {
       const preSt = preselectStudentId ? appState.students.find(s => s.id === preselectStudentId) : null;
       examState = {
         phase: 'login',
+        isReadOnly: false,
         studentTab: 'soal',
         kisiSearch: '',
         kisiType: 'ALL',
@@ -4339,6 +4456,48 @@ function doPost(e) {
       document.getElementById('teacher-app').classList.add('hidden');
       document.getElementById('student-exam-app').classList.remove('hidden');
       renderStudentExam();
+    }
+
+    function logoutStudent() {
+      if (examState.phase === 'running' && !examState.isReadOnly) {
+        openModal(`
+          <div class="p-6 text-center space-y-4">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">⚠️</div>
+            <h3 class="text-lg font-extrabold text-slate-900">Keluar dari Sesi Ujian?</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Ujian kamu masih berlangsung. Jawaban sementara yang telah kamu pilih tersimpan aman di perangkat ini.
+            </p>
+            <div class="flex gap-2.5 pt-2">
+              <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">Lanjutkan Ujian</button>
+              <button onclick="executeStudentLogout()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold transition shadow-xs">Keluar / Logout</button>
+            </div>
+          </div>
+        `);
+      } else {
+        executeStudentLogout();
+      }
+    }
+
+    function executeStudentLogout() {
+      closeModal();
+      clearInterval(examState.timerHandle);
+      if (examState.isReadOnly) {
+        clearExamSession();
+      }
+      openStudentExamMode();
+      showToast('Berhasil keluar / logout dari akun siswa.', 'info');
+    }
+
+    function startReviewFromResults() {
+      examState.isReadOnly = true;
+      examState.phase = 'running';
+      examState.studentTab = 'soal';
+      examState.currentIndex = 0;
+      examState.remainingSeconds = 0;
+      examState.showNavGrid = false;
+      clearInterval(examState.timerHandle);
+      renderStudentExam();
+      showToast('Mode Tinjau aktif: Silakan membaca soal dan kisi-kisi.', 'info');
     }
 
     function openTeacherLoginModal() {
@@ -4519,7 +4678,7 @@ function doPost(e) {
                     ${appState.students.filter(s => s.kelas === examState.kelas).map(s => {
                       const exSub = findExistingSubmission(s.id, s.name, s.kelas);
                       const att = exSub ? (Number(exSub.attemptCount) || 1) : 0;
-                      const statusTag = att >= MAX_ATTEMPTS ? ' [Selesai 2/2 - Terkunci]' : (att === 1 ? ' [Percobaan 1/2]' : '');
+                      const statusTag = att >= MAX_ATTEMPTS ? ' [Selesai 2/2 - Mode Tinjau]' : (att === 1 ? ' [Percobaan 1/2]' : '');
                       return `<option value="${s.id}" ${s.id === examState.studentId ? 'selected' : ''}>${escapeHtml(s.name)} (${escapeHtml(s.nis)})${statusTag}</option>`;
                     }).join('')}
                   </select>
@@ -4529,8 +4688,11 @@ function doPost(e) {
                   <input type="text" id="exam-student-name" required value="${escapeHtml(examState.studentName)}" placeholder="Masukkan nama lengkap kamu..." class="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <button type="submit" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-200 transition">
-                  Mulai Kerjakan Soal Ujian →
+                  Mulai Kerjakan / Tinjau Soal Ujian →
                 </button>
+                <p class="text-[11px] text-slate-500 text-center leading-relaxed">
+                  Kesempatan mengerjakan maksimal 2x. Siswa yang telah selesai 2x tetap dapat login untuk melihat kisi-kisi dan mengulas soal (Mode Tinjau).
+                </p>
               </form>
 
               <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
@@ -4599,9 +4761,15 @@ function doPost(e) {
                   <button onclick="retrySecondAttempt()" class="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg transition">
                     Kerjakan Percobaan ke-2 (Perbaiki Nilai)
                   </button>
-                ` : ''}
-                <button onclick="openStudentExamMode()" class="w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition">
-                  Selesai & Kembali ke Halaman Awal
+                ` : `
+                  <button onclick="startReviewFromResults()" class="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <span>Lihat Kisi-Kisi & Soal (Mode Tinjau)</span>
+                  </button>
+                `}
+                <button onclick="logoutStudent()" class="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  <span>Selesai & Logout Siswa</span>
                 </button>
               </div>
             </div>
@@ -4629,31 +4797,43 @@ function doPost(e) {
       root.innerHTML = `
         <div class="min-h-screen flex flex-col bg-slate-100 max-w-2xl mx-auto shadow-xl bg-white sm:my-0">
           <!-- Sticky Header Ujian HP -->
-          <header class="sticky top-0 z-30 bg-indigo-700 text-white px-4 py-3 shadow-md">
+          <header class="sticky top-0 z-30 ${examState.isReadOnly ? 'bg-slate-800' : 'bg-indigo-700'} text-white px-4 py-3 shadow-md">
             <div class="flex items-center justify-between gap-2">
               <div class="min-w-0">
-                <p class="text-[10px] uppercase tracking-wider text-indigo-200 font-bold">MTs Ma'arif NU 1 Wangon • Percobaan ${examState.attemptNumber}/${MAX_ATTEMPTS}</p>
-                <p class="text-sm font-extrabold truncate">${escapeHtml(examState.studentName)} <span class="font-normal text-indigo-200">(${escapeHtml(examState.kelas)})</span></p>
+                <p class="text-[10px] uppercase tracking-wider ${examState.isReadOnly ? 'text-amber-300 font-extrabold' : 'text-indigo-200 font-bold'}">
+                  ${examState.isReadOnly ? '🔒 MTs Ma\'arif NU 1 Wangon • Mode Tinjau (Selesai 2/2)' : `MTs Ma'arif NU 1 Wangon • Percobaan ${examState.attemptNumber}/${MAX_ATTEMPTS}`}
+                </p>
+                <p class="text-sm font-extrabold truncate">${escapeHtml(examState.studentName)} <span class="font-normal ${examState.isReadOnly ? 'text-slate-300' : 'text-indigo-200'}">(${escapeHtml(examState.kelas)})</span></p>
               </div>
-              <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-1.5 shrink-0">
                 <button type="button" onclick="toggleFullscreen()" title="Layar Penuh HP" class="p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs">
                   ⛶
                 </button>
-                <div id="exam-timer-badge" class="px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-xs font-mono text-xs sm:text-sm font-extrabold tracking-wider">
-                  ⏱ ${formatTimer(examState.remainingSeconds)}
-                </div>
+                ${examState.isReadOnly ? `
+                  <div class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs font-bold flex items-center gap-1">
+                    <span>🔒</span><span class="hidden xs:inline">Hanya Lihat</span>
+                  </div>
+                ` : `
+                  <div id="exam-timer-badge" class="px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-xs font-mono text-xs sm:text-sm font-extrabold tracking-wider">
+                    ⏱ ${formatTimer(examState.remainingSeconds)}
+                  </div>
+                `}
+                <button type="button" onclick="logoutStudent()" title="Logout / Keluar Siswa" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-rose-600 hover:text-white text-white text-xs font-bold transition flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  <span class="hidden sm:inline">Keluar</span>
+                </button>
               </div>
             </div>
 
             <!-- Tab Khusus Siswa: Soal & Kisi-Kisi -->
-            <div class="mt-3 grid grid-cols-2 gap-2 bg-indigo-800/60 p-1 rounded-2xl">
+            <div class="mt-3 grid grid-cols-2 gap-2 ${examState.isReadOnly ? 'bg-slate-900/60' : 'bg-indigo-800/60'} p-1 rounded-2xl">
               <button onclick="switchStudentTab('soal')" class="py-2 rounded-xl text-xs font-bold transition ${
-                examState.studentTab === 'soal' ? 'bg-white text-indigo-700 shadow-xs' : 'text-indigo-100 hover:bg-white/10'
+                examState.studentTab === 'soal' ? (examState.isReadOnly ? 'bg-white text-slate-800 shadow-xs' : 'bg-white text-indigo-700 shadow-xs') : 'text-slate-200 hover:bg-white/10'
               }">
-                Soal Ujian (${answeredCount}/45)
+                ${examState.isReadOnly ? 'Lihat Soal (45)' : `Soal Ujian (${answeredCount}/45)`}
               </button>
               <button onclick="switchStudentTab('kisi')" class="py-2 rounded-xl text-xs font-bold transition ${
-                examState.studentTab === 'kisi' ? 'bg-white text-indigo-700 shadow-xs' : 'text-indigo-100 hover:bg-white/10'
+                examState.studentTab === 'kisi' ? (examState.isReadOnly ? 'bg-white text-slate-800 shadow-xs' : 'bg-white text-indigo-700 shadow-xs') : 'text-slate-200 hover:bg-white/10'
               }">
                 Kisi-Kisi Soal (45)
               </button>
@@ -4674,17 +4854,35 @@ function doPost(e) {
 
             <!-- Konten Soal -->
             <div class="flex-1 p-4 sm:p-6 bg-slate-50 space-y-4 pb-32">
+              ${examState.isReadOnly ? `
+                <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs flex items-start gap-2.5">
+                  <span class="text-base shrink-0">🔒</span>
+                  <div class="min-w-0">
+                    <p class="font-bold">Mode Tinjau Soal & Kisi-Kisi (Hanya Lihat)</p>
+                    <p class="text-[11px] text-amber-700 mt-0.5 leading-relaxed">
+                      Kamu telah menyelesaikan batas maksimal pengerjaan (2/2). Kamu dapat membaca kisi-kisi dan meninjau seluruh 45 soal, namun tidak dapat memilih atau mengubah jawaban.
+                    </p>
+                  </div>
+                </div>
+              ` : ''}
+
               <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-sm flex items-center justify-center">${displayNo}</span>
                     ${typeBadge}
                   </div>
-                  <button onclick="toggleFlagQuestion(${q.no})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
-                    isFlagged ? 'bg-amber-400 text-amber-950' : 'bg-slate-100 text-slate-600 hover:bg-amber-50'
-                  }">
-                    ⚑ ${isFlagged ? 'Ragu-ragu' : 'Tandai'}
-                  </button>
+                  ${examState.isReadOnly ? `
+                    <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-400">
+                      ${isFlagged ? '⚑ Ditandai' : 'Mode Baca'}
+                    </span>
+                  ` : `
+                    <button onclick="toggleFlagQuestion(${q.no})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
+                      isFlagged ? 'bg-amber-400 text-amber-950' : 'bg-slate-100 text-slate-600 hover:bg-amber-50'
+                    }">
+                      ⚑ ${isFlagged ? 'Ragu-ragu' : 'Tandai'}
+                    </button>
+                  `}
                 </div>
 
                 <p class="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed whitespace-pre-line">${escapeHtml(q.question)}</p>
@@ -4695,10 +4893,10 @@ function doPost(e) {
                     ${q.options.map((opt, idx) => {
                       const selected = examState.answers[q.no] === idx;
                       return `
-                        <button type="button" onclick="selectPGAnswer(${q.no}, ${idx})" class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 active:scale-[0.99] min-h-[52px] ${
+                        <button type="button" ${examState.isReadOnly ? '' : `onclick="selectPGAnswer(${q.no}, ${idx})"`} class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 ${examState.isReadOnly ? 'cursor-default' : 'active:scale-[0.99] cursor-pointer'} min-h-[52px] ${
                           selected
                             ? 'bg-indigo-50 border-indigo-600 text-indigo-950 font-semibold shadow-xs'
-                            : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-700'
+                            : (examState.isReadOnly ? 'bg-white border-slate-200 text-slate-700 opacity-80' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-700')
                         }">
                           <span class="w-7 h-7 rounded-xl shrink-0 flex items-center justify-center text-xs font-extrabold ${
                             selected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
@@ -4717,10 +4915,10 @@ function doPost(e) {
                     ${q.options.map((opt, idx) => {
                       const selected = currentPgkAns.includes(idx);
                       return `
-                        <button type="button" onclick="togglePGKAnswer(${q.no}, ${idx})" class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 active:scale-[0.99] min-h-[52px] ${
+                        <button type="button" ${examState.isReadOnly ? '' : `onclick="togglePGKAnswer(${q.no}, ${idx})"`} class="w-full text-left p-3.5 rounded-2xl border-2 transition flex items-start gap-3 ${examState.isReadOnly ? 'cursor-default' : 'active:scale-[0.99] cursor-pointer'} min-h-[52px] ${
                           selected
                             ? 'bg-purple-50 border-purple-600 text-purple-950 font-semibold shadow-xs'
-                            : 'bg-white border-slate-200 hover:border-purple-300 text-slate-700'
+                            : (examState.isReadOnly ? 'bg-white border-slate-200 text-slate-700 opacity-80' : 'bg-white border-slate-200 hover:border-purple-300 text-slate-700')
                         }">
                           <span class="w-7 h-7 rounded-xl shrink-0 flex items-center justify-center text-xs font-extrabold ${
                             selected ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600'
@@ -4732,8 +4930,15 @@ function doPost(e) {
                   </div>
                 ` : `
                   <div class="space-y-2 pt-1">
-                    <label class="block text-xs font-bold text-slate-600">Jawaban Esai Siswa (tersimpan otomatis saat diketik):</label>
-                    <textarea rows="5" oninput="setEssayAnswer(${q.no}, this.value)" placeholder="Ketik jawaban kamu di sini..." class="w-full p-3.5 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-sm leading-relaxed">${escapeHtml(examState.answers[q.no] || '')}</textarea>
+                    ${examState.isReadOnly ? `
+                      <label class="block text-xs font-bold text-slate-600">Jawaban Esai Kamu (Terkunci / Mode Tinjau):</label>
+                      <div class="w-full p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-800 text-sm leading-relaxed whitespace-pre-wrap min-h-[110px]">
+                        ${escapeHtml(examState.answers[q.no] || '(Tidak ada jawaban esai yang tersimpan)')}
+                      </div>
+                    ` : `
+                      <label class="block text-xs font-bold text-slate-600">Jawaban Esai Siswa (tersimpan otomatis saat diketik):</label>
+                      <textarea rows="5" oninput="setEssayAnswer(${q.no}, this.value)" placeholder="Ketik jawaban kamu di sini..." class="w-full p-3.5 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-sm leading-relaxed">${escapeHtml(examState.answers[q.no] || '')}</textarea>
+                    `}
                   </div>
                 `}
               </div>
@@ -4775,7 +4980,12 @@ function doPost(e) {
                 <span>Daftar Soal</span>
                 <span class="px-1.5 py-0.5 rounded-md bg-indigo-200 text-indigo-900 text-[10px]">${displayNo}/45</span>
               </button>
-              ${examState.currentIndex === examQuestions.length - 1 ? `
+              ${examState.isReadOnly ? `
+                <button onclick="logoutStudent()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  <span>Selesai Meninjau</span>
+                </button>
+              ` : examState.currentIndex === examQuestions.length - 1 ? `
                 <button onclick="openFinishExamModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition">
                   Kumpulkan ✓
                 </button>
@@ -4827,20 +5037,28 @@ function doPost(e) {
       const prevAttempts = existingSub ? (Number(existingSub.attemptCount) || 1) : 0;
 
       if (prevAttempts >= MAX_ATTEMPTS) {
-        openModal(`
-          <div class="p-6 text-center space-y-4">
-            <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl font-extrabold">🔒</div>
-            <h3 class="text-lg font-extrabold text-slate-900">Akses Ujian Terkunci</h3>
-            <p class="text-sm text-slate-600">
-              Siswa <strong>${escapeHtml(name)} (${escapeHtml(kelas)})</strong> sudah menyelesaikan <strong>2x kesempatan ujian</strong>. Hubungi guru jika memerlukan ujian ulang perbaikan.
-            </p>
-            <div class="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-100">
-              <p class="text-xs text-indigo-700 font-semibold">Nilai Tertinggi Kamu</p>
-              <p class="text-3xl font-extrabold text-indigo-700 mt-0.5">${existingSub.totalScore}</p>
-            </div>
-            <button onclick="closeModal()" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold">Mengerti</button>
-          </div>
-        `);
+        // Siswa telah menyelesaikan batas maksimal 2x ujian:
+        // Izinkan login tetapi hanya dalam Mode Tinjau (lihat soal & kisi-kisi, tidak bisa mengerjakan)
+        examState.isReadOnly = true;
+        examState.studentId = st ? st.id : (existingSub ? existingSub.studentId : ('S' + Date.now()));
+        examState.studentName = st ? st.name : (existingSub ? existingSub.studentName : name);
+        examState.kelas = kelas;
+        examState.attemptNumber = MAX_ATTEMPTS;
+        examState.previousSubmission = existingSub || null;
+        examState.questionOrder = buildStudentQuestionOrder(examState.studentName, examState.kelas);
+        examState.phase = 'running';
+        examState.studentTab = 'soal';
+        examState.currentIndex = 0;
+        // Muat jawaban yang pernah dikirimkan agar siswa dapat melihat hasil pekerjaannya
+        examState.answers = (existingSub && existingSub.answers) ? JSON.parse(JSON.stringify(existingSub.answers)) : {};
+        examState.flagged = {};
+        examState.remainingSeconds = 0;
+        examState.showNavGrid = false;
+        clearInterval(examState.timerHandle);
+        clearExamSession();
+
+        renderStudentExam();
+        showToast('Mode Tinjau: Kamu telah menyelesaikan 2x ujian. Silakan membaca soal dan kisi-kisi.', 'info');
         return;
       }
 
@@ -4936,12 +5154,14 @@ function doPost(e) {
     }
 
     function selectPGAnswer(no, idx) {
+      if (examState.isReadOnly) return;
       examState.answers[no] = idx;
       autoSaveExamSession();
       renderStudentExam();
     }
 
     function togglePGKAnswer(no, idx) {
+      if (examState.isReadOnly) return;
       const curr = Array.isArray(examState.answers[no]) ? [...examState.answers[no]] : [];
       const pos = curr.indexOf(idx);
       if (pos >= 0) {
@@ -4959,11 +5179,13 @@ function doPost(e) {
     }
 
     function setEssayAnswer(no, val) {
+      if (examState.isReadOnly) return;
       examState.answers[no] = val;
       autoSaveExamSession();
     }
 
     function toggleFlagQuestion(no) {
+      if (examState.isReadOnly) return;
       examState.flagged[no] = !examState.flagged[no];
       autoSaveExamSession();
       renderStudentExam();
