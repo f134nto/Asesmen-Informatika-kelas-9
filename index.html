@@ -33,7 +33,26 @@
     }
     .pulse-gentle { animation: gentlePulse 2s infinite ease-in-out; }
 
+        .kop-input {
+      border-bottom: 1.5px dashed #cbd5e1;
+      background: transparent;
+      padding: 1px 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .kop-input:hover {
+      border-bottom-color: #6366f1;
+      background-color: rgba(238, 242, 255, 0.6);
+    }
+    .kop-input:focus {
+      border-bottom: 2px solid #4f46e5;
+      background-color: #eef2ff;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
     @media print {
+      .kop-input { border: none !important; background: transparent !important; padding: 0 !important; box-shadow: none !important; }
+
       .no-print { display: none !important; }
       body { background: white !important; color: black !important; }
       main { padding: 0 !important; margin: 0 !important; }
@@ -92,7 +111,14 @@
         </button>
         <button onclick="switchTab('analisis')" data-tab="analisis" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition">
           <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <span>Analisis Nilai & Soal</span>
+          <span>Analisis Ringkas</span>
+        </button>
+        <button onclick="switchTab('analisis-khusus')" data-tab="analisis-khusus" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group">
+          <svg class="w-5 h-5 shrink-0 text-amber-400 group-hover:scale-110 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span class="flex items-center justify-between w-full">
+            <span>Analisis Khusus Nilai</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold uppercase tracking-wider">7 Lembar</span>
+          </span>
         </button>
       </nav>
 
@@ -1020,7 +1046,23 @@
       diffEasy: 75,
       diffHard: 45,
       teacherPin: 'F134nto',
-      customRecommendations: {}
+      customRecommendations: {},
+      // Profil Sekolah & Guru untuk Lembar Analisis Resmi
+      teacherName: 'Fitrianto Puji Pangarso, S.Kom',
+      teacherNip: '-',
+      mapel: 'Informatika',
+      kkm: 75,
+      schoolName: "MTs Ma'arif NU 1 Wangon",
+      schoolCity: 'Banyumas',
+      schoolProvince: 'Jawa Tengah',
+      principalName: 'H. Sudir, S.Ag., M.S.I.',
+      principalNip: '197104122005011003',
+      examTitle: 'PENILAIAN AKHIR SEMESTER GASAL',
+      semester: 'Gasal',
+      tahunPelajaran: '2025/2026',
+      hariUjian: 'Senin',
+      tanggalUjian: '24 November 2026',
+      tanggalKoreksi: '25 November 2026'
     };
 
     let cloudState = {
@@ -1047,6 +1089,8 @@
       nilaiSearch: '',
       selectedSubmissionIds: new Set(),
       analisisKelasFilter: 'ALL',
+      analisisKhususKelasFilter: '9A',
+      analisisKhususSubTab: 'all', // 'all' | 'profil' | 'ujian' | 'jawaban' | 'nilai' | 'butir' | 'gabungan' | 'remedial'
       questions: [],
       students: [],
       submissions: [],
@@ -2196,7 +2240,8 @@ function doPost(e) {
       soal: 'Bank & Generator Soal (30 PG, 10 PGK, 5 Esai)',
       siswa: 'Manajemen Data Siswa (Kelas 9A–9K)',
       nilai: 'Daftar Nilai & Koreksi Esai',
-      analisis: 'Analisis Nilai & Butir Soal'
+      analisis: 'Analisis Statistik & Ringkasan Soal',
+      'analisis-khusus': 'Analisis Khusus Nilai & Evaluasi Asesmen (Format Resmi)'
     };
 
     function switchTab(tab) {
@@ -2219,6 +2264,7 @@ function doPost(e) {
       else if (tab === 'siswa') renderDataSiswa(container);
       else if (tab === 'nilai') renderDaftarNilai(container);
       else if (tab === 'analisis') renderAnalisisNilai(container);
+      else if (tab === 'analisis-khusus') renderAnalisisKhususLengkap(container);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -4288,6 +4334,1576 @@ function doPost(e) {
      * 12. MODE UJIAN SISWA (HP): ANTI-DATA LOSS, AUTO-SAVE SESSION,
      * FULLSCREEN, 2 PERCOBAAN & TERKUNCI OTOMATIS
      *************************************************************************/
+        /*************************************************************************
+     * 11B. ANALISIS KHUSUS NILAI & EVALUASI ASESMEN LENGKAP (7 FORMAT GAMBAR)
+     * Format Standar Evaluasi Penilaian: Profil, Kunci, Lembar Jawaban,
+     * Daftar Nilai, Analisis Butir Soal, Analisis Gabungan & Remedial
+     * Isian Kop Atas & Profil Dapat Diedit Manual Langsung (Inline Editing)
+     *************************************************************************/
+
+    function updateAnalisisField(field, value) {
+      if (field === 'kktp' || field === 'kkm') {
+        const num = Number(value) || 75;
+        appSettings.kktp = num;
+        appSettings.kkm = num;
+      } else {
+        appSettings[field] = value;
+      }
+      saveState();
+
+      // Sinkronkan ke semua elemen input dengan atribut data-kop-field yang sama di seluruh 7 lembar
+      document.querySelectorAll(`[data-kop-field="${field}"]`).forEach(el => {
+        if (el !== document.activeElement && el.value !== String(value)) {
+          el.value = value;
+        }
+      });
+
+      const fieldLabels = {
+        teacherName: 'Nama Guru',
+        teacherNip: 'NIP Guru',
+        mapel: 'Mata Pelajaran',
+        kktp: 'KKM / KKTP',
+        kkm: 'KKM / KKTP',
+        schoolName: 'Nama Sekolah',
+        schoolCity: 'Kota/Kabupaten',
+        schoolProvince: 'Provinsi',
+        principalName: 'Kepala Madrasah',
+        principalNip: 'NIP Kepala Madrasah',
+        examTitle: 'Judul Ujian',
+        semester: 'Semester',
+        tahunPelajaran: 'Tahun Pelajaran',
+        hariUjian: 'Hari Ujian',
+        tanggalUjian: 'Tanggal Pelaksanaan',
+        tanggalKoreksi: 'Tanggal Koreksi'
+      };
+      const label = fieldLabels[field] || field;
+      showToast(`✓ ${label} diperbarui: "${value}"`, 'info');
+
+      // Jika KKM diubah, render ulang agar status ketuntasan & tabel remedial langsung ter-update
+      if (field === 'kktp' || field === 'kkm') {
+        renderAnalisisKhususLengkap(document.getElementById('main-view'));
+      }
+    }
+
+    function calculateDetailedPsychometrics(questions, submissions) {
+      const N = submissions.length;
+      if (N === 0) {
+        return {
+          items: questions.map(q => ({
+            no: q.no,
+            type: q.type,
+            materi: q.materi,
+            indikator: q.indikator,
+            level: q.level,
+            maxScore: q.type === 'ESSAY' ? 4 : 2,
+            p: 0,
+            pCat: 'Belum ada data',
+            d: 0,
+            dCat: 'Belum ada data',
+            rxy: 0,
+            rxyCat: 'Belum ada data',
+            kriteria: 'Belum ada data'
+          })),
+          r11: 0,
+          r11Cat: 'Belum ada data',
+          r11Kriteria: '-'
+        };
+      }
+
+      // Skor total per siswa (Y)
+      const Y = submissions.map(s => Number(s.totalScore) || 0);
+      const meanY = Y.reduce((a, b) => a + b, 0) / N;
+      const varY = Y.reduce((a, b) => a + Math.pow(b - meanY, 2), 0) / (N > 1 ? N - 1 : 1);
+
+      // Urutkan siswa berdasarkan total skor untuk analisis kelompok atas (Upper) & kelompok bawah (Lower)
+      const sortedSubs = [...submissions].sort((a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0));
+      const halfN = Math.max(1, Math.floor(N / 2));
+      const upperGroup = sortedSubs.slice(0, halfN);
+      const lowerGroup = sortedSubs.slice(sortedSubs.length - halfN);
+
+      let sumItemVariances = 0;
+
+      const items = questions.map(q => {
+        const maxScore = q.type === 'ESSAY' ? 4 : 2;
+
+        // Ambil skor butir untuk tiap siswa (X)
+        const X = submissions.map(s => {
+          if (q.type === 'PG') {
+            return s.answers?.[q.no] === q.answer ? 2 : 0;
+          } else if (q.type === 'PGK') {
+            const ans = s.answers?.[q.no] || [];
+            const correctCount = ans.filter(a => q.answers.includes(a)).length;
+            const wrongCount = ans.filter(a => !q.answers.includes(a)).length;
+            if (correctCount === 2 && wrongCount === 0) return 2;
+            if (correctCount === 1 && ans.length <= 2) return 1;
+            return 0;
+          } else {
+            return Number(s.essayScores?.[q.no] ?? 0);
+          }
+        });
+
+        const sumX = X.reduce((a, b) => a + b, 0);
+        const meanX = sumX / N;
+        const varX = X.reduce((a, b) => a + Math.pow(b - meanX, 2), 0) / (N > 1 ? N - 1 : 1);
+        sumItemVariances += varX;
+
+        // 1. Tingkat Kesukaran (P = meanX / maxScore)
+        const p = maxScore > 0 ? (meanX / maxScore) : 0;
+        let pCat = 'Sedang';
+        if (p >= 0.70) pCat = 'Mudah';
+        else if (p < 0.30) pCat = 'Sukar';
+
+        // 2. Daya Pembeda (D = (meanUpper - meanLower) / maxScore)
+        const getGroupMean = grp => {
+          let sum = 0;
+          grp.forEach(s => {
+            if (q.type === 'PG') {
+              if (s.answers?.[q.no] === q.answer) sum += 2;
+            } else if (q.type === 'PGK') {
+              const ans = s.answers?.[q.no] || [];
+              const c = ans.filter(a => q.answers.includes(a)).length;
+              const w = ans.filter(a => !q.answers.includes(a)).length;
+              if (c === 2 && w === 0) sum += 2;
+              else if (c === 1 && ans.length <= 2) sum += 1;
+            } else {
+              sum += Number(s.essayScores?.[q.no] ?? 0);
+            }
+          });
+          return sum / grp.length;
+        };
+
+        const meanUpper = getGroupMean(upperGroup);
+        const meanLower = getGroupMean(lowerGroup);
+        const d = maxScore > 0 ? ((meanUpper - meanLower) / maxScore) : 0;
+        let dCat = 'Jelek';
+        if (d >= 0.40) dCat = 'Sangat Baik';
+        else if (d >= 0.30) dCat = 'Baik';
+        else if (d >= 0.20) dCat = 'Cukup';
+
+        // 3. Validitas Pearson Product Moment (r_xy)
+        let rxy = 0;
+        if (varX > 0 && varY > 0) {
+          let sumDiffProd = 0;
+          for (let i = 0; i < N; i++) {
+            sumDiffProd += (X[i] - meanX) * (Y[i] - meanY);
+          }
+          const stdX = Math.sqrt(varX * (N - 1));
+          const stdY = Math.sqrt(varY * (N - 1));
+          rxy = (stdX * stdY > 0) ? (sumDiffProd / (stdX * stdY)) : 0;
+          rxy = Math.max(-1, Math.min(1, rxy));
+        }
+
+        let rxyCat = 'Tidak Valid';
+        if (rxy >= 0.30) rxyCat = 'Valid';
+        else if (rxy >= 0.20) rxyCat = 'Cukup Valid';
+
+        // 4. Kriteria Soal
+        let kriteria = 'Diterima';
+        if (d >= 0.30 && rxy >= 0.20) {
+          kriteria = 'Diterima';
+        } else if (d >= 0.20 || rxy >= 0.20) {
+          kriteria = 'Diperbaiki';
+        } else {
+          kriteria = 'Ditolak';
+        }
+
+        return {
+          no: q.no,
+          type: q.type,
+          materi: q.materi,
+          indikator: q.indikator,
+          level: q.level,
+          maxScore,
+          p,
+          pCat,
+          d,
+          dCat,
+          rxy,
+          rxyCat,
+          kriteria
+        };
+      });
+
+      // 5. Reliabilitas Alpha Cronbach (r_11)
+      const k = questions.length;
+      let r11 = 0;
+      if (k > 1 && varY > 0) {
+        r11 = (k / (k - 1)) * (1 - (sumItemVariances / varY));
+        r11 = Math.max(0, Math.min(1, r11));
+      }
+
+      let r11Cat = 'Sangat Tinggi';
+      let r11Kriteria = 'Reliabel';
+      if (r11 >= 0.80) {
+        r11Cat = 'Sangat Tinggi';
+        r11Kriteria = 'Sangat Reliabel';
+      } else if (r11 >= 0.60) {
+        r11Cat = 'Tinggi';
+        r11Kriteria = 'Reliabel';
+      } else if (r11 >= 0.40) {
+        r11Cat = 'Sedang';
+        r11Kriteria = 'Cukup Reliabel';
+      } else {
+        r11Cat = 'Rendah';
+        r11Kriteria = 'Kurang Reliabel';
+      }
+
+      return { items, r11, r11Cat, r11Kriteria };
+    }
+
+    function renderAnalisisKhususLengkap(container) {
+      const activeKelas = appState.analisisKhususKelasFilter || '9A';
+      const activeSubTab = appState.analisisKhususSubTab || 'all';
+
+      const studentsInClass = activeKelas === 'ALL'
+        ? [...appState.students]
+        : appState.students.filter(s => s.kelas === activeKelas);
+
+      const submissionsInClass = activeKelas === 'ALL'
+        ? [...appState.submissions]
+        : appState.submissions.filter(s => s.kelas === activeKelas);
+
+      const psychometrics = calculateDetailedPsychometrics(appState.questions, submissionsInClass);
+
+      container.innerHTML = `
+        <div class="space-y-6 pb-20">
+          <!-- Top Bar Navigasi Analisis Khusus -->
+          <div class="no-print bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-extrabold uppercase tracking-wider">Format Resmi Asesmen</span>
+                  <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">45 Butir Soal (30 PG, 10 PGK, 5 Esai)</span>
+                </div>
+                <h2 class="text-2xl font-black text-slate-900 mt-1">Analisis Nilai & Evaluasi Asesmen</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Seluruh isian di kop atas (Nama Guru, Kepala Madrasah, Tanggal Pelaksanaan, dll.) dapat langsung diklik dan diedit manual secara instan.</p>
+              </div>
+
+              <!-- Filter Kelas & Tombol Aksi -->
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-2xl border border-slate-200">
+                  <label class="text-xs font-bold text-slate-600 pl-2">Kelas:</label>
+                  <select onchange="setAnalisisKhususKelas(this.value)" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <option value="ALL" ${activeKelas === 'ALL' ? 'selected' : ''}>Semua Kelas (9A–9K)</option>
+                    ${CLASSES.map(c => `<option value="${c}" ${c === activeKelas ? 'selected' : ''}>Kelas ${c}</option>`).join('')}
+                  </select>
+                </div>
+
+                <button onclick="openEditProfilAnalisisModal()" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5" title="Buka form dialog edit profil">
+                  <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  <span>Dialog Edit Kop</span>
+                </button>
+
+                <button onclick="exportAnalisisKhususExcel()" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="Ekspor seluruh lembar ke Excel">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  <span>Ekspor Excel (.xls)</span>
+                </button>
+
+                <button onclick="printAnalisisKhusus()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                  <span>Cetak Dokumen</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Petunjuk Pengeditan Manual Kop -->
+            <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50/70 border border-indigo-100 text-indigo-900 text-xs font-semibold">
+              <span class="text-indigo-600 text-sm">💡</span>
+              <span><strong>Tips Pengisian Kop:</strong> Anda dapat mengklik langsung nama guru, nama kepala madrasah, tanggal pelaksanaan, atau teks kop lainnya di bawah ini untuk mengubah data secara cepat. Perubahan otomatis tersimpan dan terhubung ke seluruh lembar.</span>
+            </div>
+
+            <!-- Tab Tombol 7 Gambar / Halaman -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 border-t border-slate-100">
+              ${[
+                { id: 'all', label: '★ Tampilkan Semua (Lengkap)' },
+                { id: 'profil', label: '1. Profil (Guru, Siswa, Sekolah)' },
+                { id: 'ujian', label: '2. Profil Ujian & Kunci' },
+                { id: 'jawaban', label: '3. Jawaban Peserta' },
+                { id: 'nilai', label: '4. Daftar Nilai' },
+                { id: 'butir', label: '5. Analisis Butir Soal' },
+                { id: 'gabungan', label: '6. Analisis Gabungan & Rangking' },
+                { id: 'remedial', label: '7. Peserta Remedial' }
+              ].map(t => `
+                <button onclick="setAnalisisKhususTab('${t.id}')" class="px-3 py-2 rounded-xl text-xs font-bold shrink-0 transition ${
+                  activeSubTab === t.id
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }">
+                  ${t.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- CONTAINER KONTEN ANALISIS SESUAI GAMBAR -->
+          <div id="analisis-khusus-print-area" class="space-y-8">
+            ${activeSubTab === 'all' || activeSubTab === 'profil' ? renderGambar1ProfilHtml(studentsInClass, appSettings, activeKelas) : ''}
+            ${activeSubTab === 'all' || activeSubTab === 'ujian' ? renderGambar2ProfilUjianHtml(appState.questions, appSettings) : ''}
+            ${activeSubTab === 'all' || activeSubTab === 'jawaban' ? renderGambar3JawabanPesertaHtml(studentsInClass, submissionsInClass, appState.questions, appSettings, activeKelas) : ''}
+            ${activeSubTab === 'all' || activeSubTab === 'nilai' ? renderGambar4DaftarNilaiHtml(studentsInClass, submissionsInClass, appSettings, activeKelas) : ''}
+            ${activeSubTab === 'all' || activeSubTab === 'butir' ? renderGambar5AnalisisButirHtml(psychometrics, submissionsInClass.length, appSettings, activeKelas) : ''}
+            ${activeSubTab === 'all' || activeSubTab === 'gabungan' ? renderGambar6AnalisisGabunganHtml(studentsInClass, submissionsInClass, appSettings, activeKelas) : ''}
+            ${activeSubTab === 'all' || activeSubTab === 'remedial' ? renderGambar7RemedialHtml(studentsInClass, submissionsInClass, appState.questions, appSettings, activeKelas) : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function setAnalisisKhususKelas(kelas) {
+      appState.analisisKhususKelasFilter = kelas;
+      renderAnalisisKhususLengkap(document.getElementById('main-view'));
+    }
+
+    function setAnalisisKhususTab(tab) {
+      appState.analisisKhususSubTab = tab;
+      renderAnalisisKhususLengkap(document.getElementById('main-view'));
+    }
+
+    /*************************************************************************
+     * GAMBAR 1: PROFIL GURU, PROFIL PESERTA DIDIK, PROFIL SEKOLAH
+     *************************************************************************/
+    function renderGambar1ProfilHtml(students, settings, kelas) {
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <div class="text-center border-b border-slate-200 pb-3">
+            <h3 class="text-base font-black text-slate-900 tracking-wide uppercase">LEMBAR PROFIL GURU, PESERTA DIDIK & SEKOLAH</h3>
+            <p class="text-xs text-slate-500 font-semibold">
+              <input type="text" data-kop-field="examTitle" value="${escapeHtml(settings.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" onchange="updateAnalisisField('examTitle', this.value)" class="kop-input font-bold text-slate-700 text-center uppercase tracking-wide" title="Klik untuk edit Judul Ujian">
+              • TAHUN PELAJARAN
+              <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input font-bold text-slate-700 text-center w-24" title="Klik untuk edit Tahun Pelajaran">
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            <!-- 1. PROFIL GURU (Orange Header) -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs">
+              <div class="bg-[#f97316] text-white text-center font-extrabold text-sm py-2 px-3 tracking-wider uppercase">
+                PROFIL GURU
+              </div>
+              <table class="w-full text-xs border-collapse">
+                <tbody>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 w-1/3 border-r border-slate-200">Nama</td>
+                    <td class="py-1 px-2 text-slate-900 font-bold">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="teacherName" value="${escapeHtml(settings.teacherName || 'Fitrianto Puji Pangarso, S.Kom')}" onchange="updateAnalisisField('teacherName', this.value)" class="kop-input font-bold text-slate-900 w-full" title="Klik untuk edit Nama Guru">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">NIP.</td>
+                    <td class="py-1 px-2 text-slate-800">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="teacherNip" value="${escapeHtml(settings.teacherNip || '-')}" onchange="updateAnalisisField('teacherNip', this.value)" class="kop-input text-slate-800 w-full" title="Klik untuk edit NIP Guru">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Mata Pelajaran</td>
+                    <td class="py-1 px-2 text-slate-800 font-semibold">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="mapel" value="${escapeHtml(settings.mapel || 'Informatika')}" onchange="updateAnalisisField('mapel', this.value)" class="kop-input font-semibold text-slate-800 w-full" title="Klik untuk edit Mata Pelajaran">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">KKM</td>
+                    <td class="py-1 px-2 text-slate-900 font-bold">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="number" data-kop-field="kktp" min="50" max="100" value="${settings.kktp || 75}" onchange="updateAnalisisField('kktp', Number(this.value))" class="kop-input font-bold text-indigo-700 w-20" title="Klik untuk edit KKM / KKTP">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Kelas</td>
+                    <td class="py-1.5 px-3 text-slate-800 font-semibold">: ${kelas === 'ALL' ? 'IX (9A–9K)' : 'Kelas ' + kelas}</td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Semester</td>
+                    <td class="py-1 px-2 text-slate-800">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="semester" value="${escapeHtml(settings.semester || 'Gasal')}" onchange="updateAnalisisField('semester', this.value)" class="kop-input text-slate-800 w-full" title="Klik untuk edit Semester">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Tahun Pelajaran</td>
+                    <td class="py-1 px-2 text-slate-800">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input text-slate-800 w-full" title="Klik untuk edit Tahun Pelajaran">
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 2. PROFIL PESERTA DIDIK (Blue Header) -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs">
+              <div class="bg-[#3b82f6] text-white text-center font-extrabold text-sm py-2 px-3 tracking-wider uppercase">
+                PROFIL PESERTA DIDIK
+              </div>
+              <div class="max-h-[380px] overflow-y-auto">
+                <table class="w-full text-xs border-collapse">
+                  <thead class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 sticky top-0">
+                    <tr>
+                      <th class="py-1.5 px-2 border-r border-slate-300 w-12 text-center">No</th>
+                      <th class="py-1.5 px-3 border-r border-slate-300 text-left">Nama</th>
+                      <th class="py-1.5 px-2 w-14 text-center">L/P</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${students.length === 0 ? `
+                      <tr><td colspan="3" class="py-4 text-center text-slate-400">Tidak ada data siswa untuk kelas ini.</td></tr>
+                    ` : students.map((st, idx) => `
+                      <tr class="border-b border-slate-200 hover:bg-slate-50">
+                        <td class="py-1.5 px-2 text-center text-slate-600 font-medium border-r border-slate-200">${idx + 1}</td>
+                        <td class="py-1.5 px-3 text-slate-900 font-semibold border-r border-slate-200 truncate max-w-[150px]">${escapeHtml(st.name)}</td>
+                        <td class="py-1.5 px-2 text-center text-slate-700 font-bold">${st.gender || 'L'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3. PROFIL SEKOLAH (Green Header) -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs">
+              <div class="bg-[#22c55e] text-white text-center font-extrabold text-sm py-2 px-3 tracking-wider uppercase">
+                PROFIL SEKOLAH
+              </div>
+              <table class="w-full text-xs border-collapse">
+                <tbody>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 w-1/3 border-r border-slate-200">Nama Sekolah</td>
+                    <td class="py-1 px-2 text-slate-900 font-bold">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="schoolName" value="${escapeHtml(settings.schoolName || "MTs Ma'arif NU 1 Wangon")}" onchange="updateAnalisisField('schoolName', this.value)" class="kop-input font-bold text-slate-900 w-full" title="Klik untuk edit Nama Sekolah">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Nama Kota/Kab</td>
+                    <td class="py-1 px-2 text-slate-800 font-semibold">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="schoolCity" value="${escapeHtml(settings.schoolCity || 'Banyumas')}" onchange="updateAnalisisField('schoolCity', this.value)" class="kop-input font-semibold text-slate-800 w-full" title="Klik untuk edit Kota/Kabupaten">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Provinsi</td>
+                    <td class="py-1 px-2 text-slate-800">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="schoolProvince" value="${escapeHtml(settings.schoolProvince || 'Jawa Tengah')}" onchange="updateAnalisisField('schoolProvince', this.value)" class="kop-input text-slate-800 w-full" title="Klik untuk edit Provinsi">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Kepala</td>
+                    <td class="py-1 px-2 text-slate-900 font-bold">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="principalName" value="${escapeHtml(settings.principalName || 'H. Sudir, S.Ag., M.S.I.')}" onchange="updateAnalisisField('principalName', this.value)" class="kop-input font-bold text-slate-900 w-full" title="Klik untuk edit Kepala Madrasah">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">NIP.</td>
+                    <td class="py-1 px-2 text-slate-800">
+                      <div class="flex items-center gap-1">
+                        <span class="text-slate-400 select-none">:</span>
+                        <input type="text" data-kop-field="principalNip" value="${escapeHtml(settings.principalNip || '197104122005011003')}" onchange="updateAnalisisField('principalNip', this.value)" class="kop-input text-slate-800 w-full" title="Klik untuk edit NIP Kepala Madrasah">
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * GAMBAR 2: PROFIL UJIAN & KUNCI JAWABAN (45 BUTIR: PG, PGK, ESSAY)
+     *************************************************************************/
+    function renderGambar2ProfilUjianHtml(questions, settings) {
+      const colRanges = [
+        { start: 1, end: 10 },
+        { start: 11, end: 20 },
+        { start: 21, end: 30 },
+        { start: 31, end: 40 },
+        { start: 41, end: 45 }
+      ];
+
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <!-- Header Kuning / Emas PROFIL UJIAN -->
+          <div class="border border-slate-400 rounded-xl overflow-hidden">
+            <div class="bg-[#f59e0b] text-white text-center font-black text-sm sm:text-base py-2.5 tracking-widest uppercase">
+              PROFIL UJIAN
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Metadata Ujian Kiri -->
+            <table class="w-full text-xs border border-slate-300 rounded-lg overflow-hidden border-collapse">
+              <tbody>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 w-2/5 border-r border-slate-200">Nama Ujian</td>
+                  <td class="py-1 px-2 text-slate-900 font-bold">
+                    <input type="text" data-kop-field="examTitle" value="${escapeHtml(settings.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" onchange="updateAnalisisField('examTitle', this.value)" class="kop-input font-bold text-slate-900 w-full" title="Klik untuk edit Nama Ujian">
+                  </td>
+                </tr>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Jenis Ujian</td>
+                  <td class="py-1.5 px-3 text-rose-700 font-black">Pilihan Ganda (30), PGK (10), Esai (5)</td>
+                </tr>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Jumlah Soal</td>
+                  <td class="py-1.5 px-3 text-slate-900 font-bold">45 Butir</td>
+                </tr>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Skala</td>
+                  <td class="py-1.5 px-3 text-slate-900 font-bold">100</td>
+                </tr>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Skor Benar</td>
+                  <td class="py-1.5 px-3 text-slate-800">PG: 2 | PGK: 2 | Esai: 4 (Total 100)</td>
+                </tr>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Skor Salah</td>
+                  <td class="py-1.5 px-3 text-slate-800 font-bold">0</td>
+                </tr>
+                <tr>
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-1.5 px-3 border-r border-slate-200">Skor Tidak Menjawab</td>
+                  <td class="py-1.5 px-3 text-slate-800 font-bold">0</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Metadata Ujian Kanan -->
+            <table class="w-full text-xs border border-slate-300 rounded-lg overflow-hidden border-collapse h-fit">
+              <tbody>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-2 px-3 w-2/5 border-r border-slate-200">Hari Ujian</td>
+                  <td class="py-1 px-2 text-slate-800 font-bold">
+                    <div class="flex items-center gap-1">
+                      <span class="text-slate-400 select-none">:</span>
+                      <input type="text" data-kop-field="hariUjian" value="${escapeHtml(settings.hariUjian || 'Senin')}" onchange="updateAnalisisField('hariUjian', this.value)" class="kop-input font-bold text-slate-800 w-full" title="Klik untuk edit Hari Pelaksanaan">
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b border-slate-200">
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-2 px-3 border-r border-slate-200">Tanggal Ujian</td>
+                  <td class="py-1 px-2 text-slate-800 font-bold">
+                    <div class="flex items-center gap-1">
+                      <span class="text-slate-400 select-none">:</span>
+                      <input type="text" data-kop-field="tanggalUjian" value="${escapeHtml(settings.tanggalUjian || '24 November 2026')}" onchange="updateAnalisisField('tanggalUjian', this.value)" class="kop-input font-bold text-slate-800 w-full" title="Klik untuk edit Tanggal Pelaksanaan">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="bg-slate-100 font-semibold text-slate-700 py-2 px-3 border-r border-slate-200">Tanggal Koreksi Ujian</td>
+                  <td class="py-1 px-2 text-slate-800 font-bold">
+                    <div class="flex items-center gap-1">
+                      <span class="text-slate-400 select-none">:</span>
+                      <input type="text" data-kop-field="tanggalKoreksi" value="${escapeHtml(settings.tanggalKoreksi || '25 November 2026')}" onchange="updateAnalisisField('tanggalKoreksi', this.value)" class="kop-input font-bold text-slate-800 w-full" title="Klik untuk edit Tanggal Koreksi">
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tabel Kunci Jawaban (5 Kolom Sesuai Gambar 2) -->
+          <div class="border border-slate-300 rounded-xl overflow-hidden mt-2">
+            <div class="bg-slate-100 font-extrabold text-xs text-slate-800 py-2 px-4 border-b border-slate-300 flex items-center justify-between">
+              <span>KUNCI JAWABAN SOAL ASESMEN (1–45)</span>
+              <span class="text-[11px] text-slate-500 font-normal">Otomatis terisi dari bank soal aplikasi</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 divide-x divide-slate-200 text-xs">
+              ${colRanges.map(col => `
+                <div>
+                  <table class="w-full border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                      <tr>
+                        <th class="py-1 px-2 border-r border-slate-200 text-center w-10">No</th>
+                        <th class="py-1 px-2 text-center">Kunci</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${Array.from({ length: col.end - col.start + 1 }, (_, i) => {
+                        const no = col.start + i;
+                        const q = questions.find(item => item.no === no);
+                        let keyText = '-';
+                        if (q) {
+                          if (q.type === 'PG') {
+                            keyText = OPTION_LETTERS[q.answer] || '-';
+                          } else if (q.type === 'PGK') {
+                            keyText = (q.answers || []).map(idx => OPTION_LETTERS[idx]).join(' & ');
+                          } else {
+                            keyText = 'Rubrik (Skor 4)';
+                          }
+                        }
+                        return `
+                          <tr class="border-b border-slate-100 hover:bg-slate-50">
+                            <td class="py-1.5 px-2 text-center font-bold text-slate-600 bg-slate-50/60 border-r border-slate-200">${no}</td>
+                            <td class="py-1.5 px-2 text-center font-extrabold ${no <= 30 ? 'text-indigo-700' : (no <= 40 ? 'text-purple-700 text-[11px]' : 'text-amber-700 text-[10px]')}">${keyText}</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * GAMBAR 3: JAWABAN PESERTA (MATRIKS JAWABAN 1-45 OTOMATIS DARI SISWA)
+     *************************************************************************/
+    function renderGambar3JawabanPesertaHtml(students, submissions, questions, settings, kelas) {
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <!-- Formal Document Kop -->
+          <div class="text-center border-b border-slate-200 pb-3">
+            <h3 class="text-base font-black text-slate-900 tracking-wider uppercase">JAWABAN PESERTA</h3>
+            <h4 class="text-xs font-extrabold text-slate-700 tracking-wide uppercase">
+              <input type="text" data-kop-field="examTitle" value="${escapeHtml(settings.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" onchange="updateAnalisisField('examTitle', this.value)" class="kop-input font-bold text-slate-700 text-center uppercase tracking-wide w-full max-w-lg" title="Klik untuk edit Judul Ujian">
+            </h4>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between text-xs gap-4 text-slate-700 pb-2">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Nama Sekolah</span>
+                <span>:</span>
+                <input type="text" data-kop-field="schoolName" value="${escapeHtml(settings.schoolName || "MTs Ma'arif NU 1 Wangon")}" onchange="updateAnalisisField('schoolName', this.value)" class="kop-input font-bold w-52" title="Klik untuk edit Nama Sekolah">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Mata Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="mapel" value="${escapeHtml(settings.mapel || 'Informatika')}" onchange="updateAnalisisField('mapel', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Mata Pelajaran">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Kelas</span>
+                <span>:</span>
+                <span class="font-bold text-slate-900 px-1">${kelas === 'ALL' ? 'Semua Kelas (9A–9K)' : 'Kelas ' + kelas}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Semester</span>
+                <span>:</span>
+                <input type="text" data-kop-field="semester" value="${escapeHtml(settings.semester || 'Gasal')}" onchange="updateAnalisisField('semester', this.value)" class="kop-input font-bold w-24" title="Klik untuk edit Semester">
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Hari / Tgl Ujian</span>
+                <span>:</span>
+                <input type="text" data-kop-field="hariUjian" value="${escapeHtml(settings.hariUjian || 'Senin')}" onchange="updateAnalisisField('hariUjian', this.value)" class="kop-input font-bold w-20 text-center" title="Klik untuk edit Hari">
+                <span>/</span>
+                <input type="text" data-kop-field="tanggalUjian" value="${escapeHtml(settings.tanggalUjian || '24 November 2026')}" onchange="updateAnalisisField('tanggalUjian', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Tanggal Pelaksanaan">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jenis Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">Pilihan Ganda, PGK & Esai</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jumlah Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">45 butir</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Tahun Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input font-bold w-28" title="Klik untuk edit Tahun Pelajaran">
+              </div>
+            </div>
+          </div>
+
+          <!-- Matriks Jawaban 45 Butir -->
+          <div class="overflow-x-auto border border-slate-300 rounded-xl">
+            <table class="w-full text-xs border-collapse">
+              <thead>
+                <!-- Baris Judul Kolom -->
+                <tr class="bg-slate-100 text-slate-800 font-extrabold border-b border-slate-300">
+                  <th rowspan="2" class="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                  <th rowspan="2" class="py-2 px-3 border-r border-slate-300 text-left min-w-[140px]">Nama Peserta</th>
+                  <th rowspan="2" class="py-2 px-2 border-r border-slate-300 text-center w-10">L/P</th>
+                  <th colspan="45" class="py-1 px-2 border-b border-slate-200 text-center uppercase tracking-wider text-[11px] bg-slate-200/80">
+                    Nomor Ujian dan Jawaban Peserta (1–45)
+                  </th>
+                </tr>
+                <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                  ${Array.from({ length: 45 }, (_, i) => `<th class="py-1 px-1 border-r border-slate-200 text-center text-[10px] min-w-[20px]">${i + 1}</th>`).join('')}
+                </tr>
+                <!-- Baris KUNCI JAWABAN -->
+                <tr class="bg-amber-100/90 text-amber-950 font-black border-b-2 border-slate-400">
+                  <td colspan="3" class="py-1.5 px-3 border-r border-slate-300 text-right uppercase tracking-wider text-[11px]">
+                    KUNCI JAWABAN :
+                  </td>
+                  ${Array.from({ length: 45 }, (_, i) => {
+                    const no = i + 1;
+                    const q = questions.find(item => item.no === no);
+                    let k = '-';
+                    if (q) {
+                      if (q.type === 'PG') k = OPTION_LETTERS[q.answer] || '-';
+                      else if (q.type === 'PGK') k = (q.answers || []).map(idx => OPTION_LETTERS[idx]).join('');
+                      else k = 'E';
+                    }
+                    return `<td class="py-1 px-1 border-r border-slate-300 text-center font-black text-[11px]">${k}</td>`;
+                  }).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${students.length === 0 ? `
+                  <tr><td colspan="48" class="py-6 text-center text-slate-400">Belum ada peserta terdaftar.</td></tr>
+                ` : students.map((st, idx) => {
+                  const sub = submissions.find(s => s.studentId === st.id || (s.studentName.trim().toLowerCase() === st.name.trim().toLowerCase() && s.kelas === st.kelas));
+                  return `
+                    <tr class="border-b border-slate-200 hover:bg-indigo-50/30">
+                      <td class="py-1.5 px-2 text-center text-slate-600 font-medium border-r border-slate-200">${idx + 1}</td>
+                      <td class="py-1.5 px-3 text-slate-900 font-semibold border-r border-slate-200 truncate">${escapeHtml(st.name)}</td>
+                      <td class="py-1.5 px-2 text-center text-slate-700 font-bold border-r border-slate-200">${st.gender || 'L'}</td>
+                      ${Array.from({ length: 45 }, (_, i) => {
+                        const no = i + 1;
+                        const q = questions.find(item => item.no === no);
+                        if (!sub || !sub.answers) {
+                          return `<td class="py-1 px-1 border-r border-slate-100 text-center text-slate-300 text-[10px]">-</td>`;
+                        }
+                        const ans = sub.answers[no];
+                        if (ans === undefined || ans === null) {
+                          return `<td class="py-1 px-1 border-r border-slate-100 text-center text-slate-300 text-[10px]">-</td>`;
+                        }
+
+                        if (q.type === 'PG') {
+                          const letter = OPTION_LETTERS[ans] || '';
+                          const isCorrect = ans === q.answer;
+                          return `
+                            <td class="py-1 px-1 border-r border-slate-100 text-center font-bold text-[11px] ${
+                              isCorrect ? 'text-emerald-700 font-extrabold' : 'text-slate-400 font-normal lowercase'
+                            }">
+                              ${letter}
+                            </td>
+                          `;
+                        } else if (q.type === 'PGK') {
+                          const arr = Array.isArray(ans) ? ans : [];
+                          const txt = arr.map(idx => OPTION_LETTERS[idx]).join('');
+                          const isFull = arr.length === 2 && arr.every(a => q.answers.includes(a));
+                          return `
+                            <td class="py-1 px-0.5 border-r border-slate-100 text-center font-bold text-[9px] ${
+                              isFull ? 'text-purple-700 font-extrabold' : 'text-purple-400'
+                            }">
+                              ${txt || '-'}
+                            </td>
+                          `;
+                        } else {
+                          const sc = sub.essayScores?.[no] ?? (ans ? 3 : 0);
+                          return `
+                            <td class="py-1 px-1 border-r border-slate-100 text-center font-extrabold text-[10px] ${
+                              sc >= 3 ? 'text-amber-700' : 'text-slate-500'
+                            }">
+                              ${sc}
+                            </td>
+                          `;
+                        }
+                      }).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * GAMBAR 4: DAFTAR NILAI PESERTA (TERHUBUNG OTOMATIS)
+     *************************************************************************/
+    function renderGambar4DaftarNilaiHtml(students, submissions, settings, kelas) {
+      let sumScore = 0;
+      let countWithScore = 0;
+      let maxSc = 0;
+      let minSc = 100;
+
+      const studentRows = students.map((st, idx) => {
+        const sub = submissions.find(s => s.studentId === st.id || (s.studentName.trim().toLowerCase() === st.name.trim().toLowerCase() && s.kelas === st.kelas));
+        const hasScore = sub && typeof sub.totalScore === 'number';
+        const score = hasScore ? sub.totalScore : 0;
+        if (hasScore) {
+          sumScore += score;
+          countWithScore++;
+          if (score > maxSc) maxSc = score;
+          if (score < minSc) minSc = score;
+        }
+        return { st, sub, score, hasScore, idx: idx + 1 };
+      });
+
+      if (countWithScore === 0) minSc = 0;
+      const avgSc = countWithScore ? (sumScore / countWithScore).toFixed(1) : '0.0';
+
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <!-- Kop Formal Daftar Nilai Peserta -->
+          <div class="text-center border-b border-slate-200 pb-3">
+            <h3 class="text-base font-black text-slate-900 tracking-wider uppercase">DAFTAR NILAI PESERTA</h3>
+            <h4 class="text-xs font-extrabold text-slate-700 tracking-wide uppercase">
+              <input type="text" data-kop-field="examTitle" value="${escapeHtml(settings.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" onchange="updateAnalisisField('examTitle', this.value)" class="kop-input font-bold text-slate-700 text-center uppercase tracking-wide w-full max-w-lg" title="Klik untuk edit Judul Ujian">
+            </h4>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between text-xs gap-4 text-slate-700 pb-2">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Nama Sekolah</span>
+                <span>:</span>
+                <input type="text" data-kop-field="schoolName" value="${escapeHtml(settings.schoolName || "MTs Ma'arif NU 1 Wangon")}" onchange="updateAnalisisField('schoolName', this.value)" class="kop-input font-bold w-52" title="Klik untuk edit Nama Sekolah">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Mata Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="mapel" value="${escapeHtml(settings.mapel || 'Informatika')}" onchange="updateAnalisisField('mapel', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Mata Pelajaran">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Kelas</span>
+                <span>:</span>
+                <span class="font-bold text-slate-900 px-1">${kelas === 'ALL' ? 'Semua Kelas (9A–9K)' : 'Kelas ' + kelas}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Semester</span>
+                <span>:</span>
+                <input type="text" data-kop-field="semester" value="${escapeHtml(settings.semester || 'Gasal')}" onchange="updateAnalisisField('semester', this.value)" class="kop-input font-bold w-24" title="Klik untuk edit Semester">
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Hari / Tgl Ujian</span>
+                <span>:</span>
+                <input type="text" data-kop-field="hariUjian" value="${escapeHtml(settings.hariUjian || 'Senin')}" onchange="updateAnalisisField('hariUjian', this.value)" class="kop-input font-bold w-20 text-center" title="Klik untuk edit Hari">
+                <span>/</span>
+                <input type="text" data-kop-field="tanggalUjian" value="${escapeHtml(settings.tanggalUjian || '24 November 2026')}" onchange="updateAnalisisField('tanggalUjian', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Tanggal Pelaksanaan">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jenis Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">Pilihan Ganda, PGK & Esai</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jumlah Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">45 butir</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Tahun Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input font-bold w-28" title="Klik untuk edit Tahun Pelajaran">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Nilai Peserta -->
+          <div class="border border-slate-300 rounded-xl overflow-hidden">
+            <table class="w-full text-xs border-collapse">
+              <thead class="bg-slate-100 text-slate-800 font-extrabold border-b border-slate-300">
+                <tr>
+                  <th class="py-2.5 px-3 border-r border-slate-300 text-center w-12">No</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-left">Nama Peserta</th>
+                  <th class="py-2.5 px-3 border-r border-slate-300 text-center w-16">L/P</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-center w-36">Jumlah Skor</th>
+                  <th class="py-2.5 px-4 text-center w-36">Nilai</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${studentRows.length === 0 ? `
+                  <tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada data peserta.</td></tr>
+                ` : studentRows.map(r => `
+                  <tr class="border-b border-slate-200 hover:bg-slate-50">
+                    <td class="py-2 px-3 text-center text-slate-600 font-medium border-r border-slate-200">${r.idx}</td>
+                    <td class="py-2 px-4 text-slate-900 font-semibold border-r border-slate-200">${escapeHtml(r.st.name)}</td>
+                    <td class="py-2 px-3 text-center text-slate-700 font-bold border-r border-slate-200">${r.st.gender || 'L'}</td>
+                    <td class="py-2 px-4 text-center text-slate-800 font-bold border-r border-slate-200">${r.hasScore ? r.score : '-'}</td>
+                    <td class="py-2 px-4 text-center font-extrabold ${r.score >= (settings.kktp || 75) ? 'text-indigo-700' : 'text-rose-600'}">
+                      ${r.hasScore ? r.score : '-'}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              <tfoot class="bg-slate-100 font-bold text-slate-800 border-t-2 border-slate-300">
+                <tr>
+                  <td colspan="3" class="py-2 px-4 text-right border-r border-slate-300 uppercase text-[11px]">Rata-rata Kelas :</td>
+                  <td class="py-2 px-4 text-center border-r border-slate-300 text-indigo-700">${avgSc}</td>
+                  <td class="py-2 px-4 text-center text-indigo-700">${avgSc}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="py-2 px-4 text-right border-r border-slate-300 uppercase text-[11px]">Nilai Tertinggi / Terendah :</td>
+                  <td class="py-2 px-4 text-center border-r border-slate-300 text-slate-600">${maxSc} / ${minSc}</td>
+                  <td class="py-2 px-4 text-center text-slate-600">${maxSc} / ${minSc}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * GAMBAR 5: ANALISIS BUTIR SOAL (TINGKAT KESUKARAN, DAYA BEDA, VALIDITAS, RELIABILITAS)
+     *************************************************************************/
+    function renderGambar5AnalisisButirHtml(psychometrics, N, settings, kelas) {
+      const items = psychometrics.items || [];
+      const r11 = psychometrics.r11;
+      const r11Cat = psychometrics.r11Cat;
+      const r11Kriteria = psychometrics.r11Kriteria;
+
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <!-- Kop Formal Analisis Butir Soal -->
+          <div class="text-center border-b border-slate-200 pb-3">
+            <h3 class="text-base font-black text-slate-900 tracking-wider uppercase">ANALISIS BUTIR SOAL PILIHAN GANDA & ESSAY</h3>
+            <h4 class="text-xs font-extrabold text-slate-700 tracking-wide uppercase">
+              <input type="text" data-kop-field="examTitle" value="${escapeHtml(settings.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" onchange="updateAnalisisField('examTitle', this.value)" class="kop-input font-bold text-slate-700 text-center uppercase tracking-wide w-full max-w-lg" title="Klik untuk edit Judul Ujian">
+            </h4>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between text-xs gap-4 text-slate-700 pb-2">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Nama Sekolah</span>
+                <span>:</span>
+                <input type="text" data-kop-field="schoolName" value="${escapeHtml(settings.schoolName || "MTs Ma'arif NU 1 Wangon")}" onchange="updateAnalisisField('schoolName', this.value)" class="kop-input font-bold w-52" title="Klik untuk edit Nama Sekolah">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Mata Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="mapel" value="${escapeHtml(settings.mapel || 'Informatika')}" onchange="updateAnalisisField('mapel', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Mata Pelajaran">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Kelas</span>
+                <span>:</span>
+                <span class="font-bold text-slate-900 px-1">${kelas === 'ALL' ? 'Semua Kelas (9A–9K)' : 'Kelas ' + kelas}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Jumlah Peserta</span>
+                <span>:</span>
+                <span class="font-bold text-slate-900 px-1">${N} Orang</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jumlah Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">45 Butir (30 PG, 10 PGK, 5 Esai)</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Hari / Tanggal</span>
+                <span>:</span>
+                <input type="text" data-kop-field="hariUjian" value="${escapeHtml(settings.hariUjian || 'Senin')}" onchange="updateAnalisisField('hariUjian', this.value)" class="kop-input font-bold w-20 text-center" title="Klik untuk edit Hari">
+                <span>/</span>
+                <input type="text" data-kop-field="tanggalUjian" value="${escapeHtml(settings.tanggalUjian || '24 November 2026')}" onchange="updateAnalisisField('tanggalUjian', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Tanggal Pelaksanaan">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Semester</span>
+                <span>:</span>
+                <input type="text" data-kop-field="semester" value="${escapeHtml(settings.semester || 'Gasal')}" onchange="updateAnalisisField('semester', this.value)" class="kop-input font-bold w-24" title="Klik untuk edit Semester">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Tahun Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input font-bold w-28" title="Klik untuk edit Tahun Pelajaran">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Analisis Butir Soal 45 Butir -->
+          <div class="overflow-x-auto border border-slate-300 rounded-xl">
+            <table class="w-full text-xs border-collapse">
+              <thead class="bg-slate-100 text-slate-800 font-extrabold border-b border-slate-300">
+                <tr>
+                  <th rowspan="2" class="py-2.5 px-2 border-r border-slate-300 text-center w-12">No Soal</th>
+                  <th colspan="2" class="py-1 px-3 border-r border-slate-300 text-center bg-indigo-50/70 text-indigo-950">Tingkat Kesukaran Soal</th>
+                  <th colspan="2" class="py-1 px-3 border-r border-slate-300 text-center bg-amber-50/70 text-amber-950">Daya Pembeda Soal</th>
+                  <th colspan="2" class="py-1 px-3 border-r border-slate-300 text-center bg-emerald-50/70 text-emerald-950">Validitas Soal</th>
+                  <th rowspan="2" class="py-2.5 px-3 border-r border-slate-300 text-center w-28">Kriteria Soal</th>
+                  <th colspan="3" class="py-1 px-3 text-center bg-purple-50/70 text-purple-950">Reliabilitas Soal</th>
+                </tr>
+                <tr class="bg-slate-50 font-bold text-slate-700 text-[11px] border-b border-slate-300">
+                  <th class="py-1.5 px-2 border-r border-slate-200 text-center w-16">Indeks</th>
+                  <th class="py-1.5 px-3 border-r border-slate-300 text-center w-20">Kategori</th>
+                  <th class="py-1.5 px-2 border-r border-slate-200 text-center w-16">Indeks</th>
+                  <th class="py-1.5 px-3 border-r border-slate-300 text-center w-24">Kategori</th>
+                  <th class="py-1.5 px-2 border-r border-slate-200 text-center w-16">Indeks</th>
+                  <th class="py-1.5 px-3 border-r border-slate-300 text-center w-24">Kategori</th>
+                  <th class="py-1.5 px-2 border-r border-slate-200 text-center w-16">Indeks</th>
+                  <th class="py-1.5 px-2 border-r border-slate-200 text-center w-20">Kriteria</th>
+                  <th class="py-1.5 px-3 text-center w-24">Kategori</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${items.map((item, idx) => {
+                  const isFirst = idx === 0;
+                  return `
+                    <tr class="border-b border-slate-200 hover:bg-slate-50">
+                      <td class="py-2 px-2 text-center font-bold text-slate-700 border-r border-slate-200 bg-slate-50/50">
+                        ${item.no}
+                        <span class="text-[9px] block text-slate-400 font-normal">${item.type}</span>
+                      </td>
+
+                      <!-- Tingkat Kesukaran -->
+                      <td class="py-2 px-2 text-center font-mono font-bold text-slate-800 border-r border-slate-200">
+                        ${item.p.toFixed(3)}
+                      </td>
+                      <td class="py-2 px-3 text-center font-semibold border-r border-slate-300 ${
+                        item.pCat === 'Mudah' ? 'text-emerald-700 bg-emerald-50/30' : (item.pCat === 'Sukar' ? 'text-rose-700 bg-rose-50/30' : 'text-amber-700 bg-amber-50/30')
+                      }">
+                        ${item.pCat}
+                      </td>
+
+                      <!-- Daya Pembeda -->
+                      <td class="py-2 px-2 text-center font-mono font-bold text-slate-800 border-r border-slate-200">
+                        ${item.d.toFixed(3)}
+                      </td>
+                      <td class="py-2 px-3 text-center font-semibold border-r border-slate-300 ${
+                        item.dCat === 'Sangat Baik' ? 'text-emerald-700 font-bold' : (item.dCat === 'Baik' ? 'text-indigo-700 font-bold' : (item.dCat === 'Cukup' ? 'text-amber-700' : 'text-rose-600'))
+                      }">
+                        ${item.dCat}
+                      </td>
+
+                      <!-- Validitas -->
+                      <td class="py-2 px-2 text-center font-mono font-bold text-slate-800 border-r border-slate-200">
+                        ${item.rxy.toFixed(3)}
+                      </td>
+                      <td class="py-2 px-3 text-center font-semibold border-r border-slate-300 ${
+                        item.rxyCat === 'Valid' ? 'text-emerald-700 font-bold' : (item.rxyCat === 'Cukup Valid' ? 'text-indigo-700' : 'text-slate-500')
+                      }">
+                        ${item.rxyCat}
+                      </td>
+
+                      <!-- Kriteria Soal -->
+                      <td class="py-2 px-3 text-center font-bold border-r border-slate-300 ${
+                        item.kriteria === 'Diterima' ? 'text-emerald-700 bg-emerald-50/40' : (item.kriteria === 'Diperbaiki' ? 'text-amber-700 bg-amber-50/40' : 'text-rose-700 bg-rose-50/40')
+                      }">
+                        ${item.kriteria}
+                      </td>
+
+                      <!-- Reliabilitas (Rowspan gabungan pada baris pertama persis Gambar 5) -->
+                      ${isFirst ? `
+                        <td rowspan="45" class="py-4 px-2 text-center font-mono font-black text-indigo-700 border-r border-slate-200 align-top bg-purple-50/20 text-sm">
+                          ${r11.toFixed(3)}
+                        </td>
+                        <td rowspan="45" class="py-4 px-2 text-center font-bold text-purple-900 border-r border-slate-200 align-top bg-purple-50/20 text-xs">
+                          ${r11Kriteria}
+                        </td>
+                        <td rowspan="45" class="py-4 px-3 text-center font-black text-purple-700 align-top bg-purple-50/20 text-xs uppercase tracking-wider">
+                          ${r11Cat}
+                        </td>
+                      ` : ''}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * GAMBAR 6: ANALISIS GABUNGAN (PILIHAN GANDA, PGK & ESSAY) - RANGKING & KETUNTASAN
+     *************************************************************************/
+    function renderGambar6AnalisisGabunganHtml(students, submissions, settings, kelas) {
+      const kkm = settings.kktp || 75;
+
+      // Kumpulkan siswa dan nilai
+      const rows = students.map(st => {
+        const sub = submissions.find(s => s.studentId === st.id || (s.studentName.trim().toLowerCase() === st.name.trim().toLowerCase() && s.kelas === st.kelas));
+        const hasScore = sub && typeof sub.totalScore === 'number';
+        const score = hasScore ? sub.totalScore : 0;
+        return {
+          st,
+          score,
+          hasScore,
+          isTuntas: score >= kkm
+        };
+      });
+
+      // Urutkan untuk penentuan rangking
+      const sortedByScore = [...rows].sort((a, b) => b.score - a.score);
+      const rankMap = new Map();
+      let currentRank = 1;
+      sortedByScore.forEach((item, idx) => {
+        if (idx > 0 && item.score < sortedByScore[idx - 1].score) {
+          currentRank = idx + 1;
+        }
+        rankMap.set(item.st.id, currentRank);
+      });
+
+      const tuntasCount = rows.filter(r => r.hasScore && r.isTuntas).length;
+      const belumTuntasCount = rows.filter(r => r.hasScore && !r.isTuntas).length;
+      const testedCount = rows.filter(r => r.hasScore).length;
+      const tuntasPct = testedCount ? Math.round((tuntasCount / testedCount) * 100) : 0;
+
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <!-- Kop Formal Analisis Penilaian Akhir Semester Gasal -->
+          <div class="text-center border-b border-slate-200 pb-3">
+            <h3 class="text-base font-black text-slate-900 tracking-wider uppercase">ANALISIS PENILAIAN AKHIR SEMESTER GASAL</h3>
+            <h4 class="text-xs font-extrabold text-slate-700 tracking-wide uppercase">ANALISIS GABUNGAN (PILIHAN GANDA, PG KOMPLEKS & ESSAY)</h4>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between text-xs gap-4 text-slate-700 pb-2">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Nama Sekolah</span>
+                <span>:</span>
+                <input type="text" data-kop-field="schoolName" value="${escapeHtml(settings.schoolName || "MTs Ma'arif NU 1 Wangon")}" onchange="updateAnalisisField('schoolName', this.value)" class="kop-input font-bold w-52" title="Klik untuk edit Nama Sekolah">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Mata Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="mapel" value="${escapeHtml(settings.mapel || 'Informatika')}" onchange="updateAnalisisField('mapel', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Mata Pelajaran">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">KKM / KKTP</span>
+                <span>:</span>
+                <input type="number" data-kop-field="kktp" min="50" max="100" value="${kkm}" onchange="updateAnalisisField('kktp', Number(this.value))" class="kop-input font-bold text-indigo-700 w-20" title="Klik untuk edit KKM">
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-28 shrink-0 font-medium">Kelas</span>
+                <span>:</span>
+                <span class="font-bold text-slate-900 px-1">${kelas === 'ALL' ? 'Semua Kelas (9A–9K)' : 'Kelas ' + kelas}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-28 shrink-0 font-medium">Semester</span>
+                <span>:</span>
+                <input type="text" data-kop-field="semester" value="${escapeHtml(settings.semester || 'Gasal')}" onchange="updateAnalisisField('semester', this.value)" class="kop-input font-bold w-24" title="Klik untuk edit Semester">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-28 shrink-0 font-medium">Tahun Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input font-bold w-28" title="Klik untuk edit Tahun Pelajaran">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Analisis Gabungan & Ketuntasan -->
+          <div class="border border-slate-300 rounded-xl overflow-hidden">
+            <table class="w-full text-xs border-collapse">
+              <thead class="bg-slate-100 text-slate-800 font-extrabold border-b border-slate-300">
+                <tr>
+                  <th class="py-2.5 px-3 border-r border-slate-300 text-center w-12">No</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-left">Nama Peserta</th>
+                  <th class="py-2.5 px-3 border-r border-slate-300 text-center w-14">L/P</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-center w-28">Nilai</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-center w-28">Rangking</th>
+                  <th class="py-2.5 px-5 text-center w-40">Ketuntasan</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.length === 0 ? `
+                  <tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada data siswa.</td></tr>
+                ` : rows.map((r, idx) => {
+                  const rank = rankMap.get(r.st.id) || idx + 1;
+                  return `
+                    <tr class="border-b border-slate-200 hover:bg-slate-50">
+                      <td class="py-2 px-3 text-center text-slate-600 font-medium border-r border-slate-200">${idx + 1}</td>
+                      <td class="py-2 px-4 text-slate-900 font-semibold border-r border-slate-200">${escapeHtml(r.st.name)}</td>
+                      <td class="py-2 px-3 text-center text-slate-700 font-bold border-r border-slate-200">${r.st.gender || 'L'}</td>
+                      <td class="py-2 px-4 text-center font-extrabold text-slate-900 border-r border-slate-200">${r.hasScore ? r.score : '-'}</td>
+                      <td class="py-2 px-4 text-center font-black text-indigo-700 border-r border-slate-200">${r.hasScore ? rank : '-'}</td>
+                      <td class="py-2 px-5 text-center font-black">
+                        ${!r.hasScore ? `
+                          <span class="text-slate-400">Belum Ujian</span>
+                        ` : r.isTuntas ? `
+                          <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">TUNTAS</span>
+                        ` : `
+                          <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-rose-100 text-rose-800">BELUM TUNTAS</span>
+                        `}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Ringkasan Ketuntasan Klasikal -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
+            <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-center">
+              <p class="text-[11px] font-bold text-indigo-700 uppercase">Jumlah Peserta Ujian</p>
+              <p class="text-2xl font-black text-indigo-900 mt-0.5">${testedCount} / ${students.length}</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+              <p class="text-[11px] font-bold text-emerald-700 uppercase">Peserta Tuntas (≥ ${kkm})</p>
+              <p class="text-2xl font-black text-emerald-900 mt-0.5">${tuntasCount} Siswa</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-center">
+              <p class="text-[11px] font-bold text-rose-700 uppercase">Peserta Belum Tuntas (< ${kkm})</p>
+              <p class="text-2xl font-black text-rose-900 mt-0.5">${belumTuntasCount} Siswa</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+              <p class="text-[11px] font-bold text-amber-700 uppercase">Ketuntasan Klasikal</p>
+              <p class="text-2xl font-black text-amber-900 mt-0.5">${tuntasPct}%</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * GAMBAR 7: DAFTAR PESERTA REMEDIAL (FILTER OTOMATIS NILAI < KKM)
+     *************************************************************************/
+    function renderGambar7RemedialHtml(students, submissions, questions, settings, kelas) {
+      const kkm = settings.kktp || 75;
+
+      const remedialList = [];
+
+      students.forEach(st => {
+        const sub = submissions.find(s => s.studentId === st.id || (s.studentName.trim().toLowerCase() === st.name.trim().toLowerCase() && s.kelas === st.kelas));
+        if (sub && typeof sub.totalScore === 'number' && sub.totalScore < kkm) {
+          const wrongQuestionNos = [];
+          questions.forEach(q => {
+            if (q.type === 'PG') {
+              if (sub.answers?.[q.no] !== q.answer) wrongQuestionNos.push(q.no);
+            } else if (q.type === 'PGK') {
+              const ans = sub.answers?.[q.no] || [];
+              const correct = ans.filter(a => q.answers.includes(a)).length;
+              if (correct < 2) wrongQuestionNos.push(q.no);
+            } else {
+              const sc = sub.essayScores?.[q.no] ?? 0;
+              if (sc < 3) wrongQuestionNos.push(q.no);
+            }
+          });
+
+          let ket = 'Remedial Butir Soal Terpilih';
+          if (wrongQuestionNos.length > 0) {
+            const sampleWrong = wrongQuestionNos.slice(0, 5).map(n => '#' + n).join(', ');
+            ket = `Remedial Butir: ${sampleWrong}${wrongQuestionNos.length > 5 ? ' dkk.' : ''}`;
+          }
+
+          remedialList.push({
+            st,
+            sub,
+            score: sub.totalScore,
+            keterangan: ket
+          });
+        }
+      });
+
+      return `
+        <div class="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm space-y-4 print-card">
+          <!-- Kop Formal Daftar Peserta Remedial -->
+          <div class="text-center border-b border-slate-200 pb-3">
+            <h3 class="text-base font-black text-rose-700 tracking-wider uppercase">DAFTAR PESERTA REMEDIAL</h3>
+            <h4 class="text-xs font-extrabold text-slate-700 tracking-wide uppercase">
+              <input type="text" data-kop-field="examTitle" value="${escapeHtml(settings.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" onchange="updateAnalisisField('examTitle', this.value)" class="kop-input font-bold text-slate-700 text-center uppercase tracking-wide w-full max-w-lg" title="Klik untuk edit Judul Ujian">
+            </h4>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between text-xs gap-4 text-slate-700 pb-2">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Nama Sekolah</span>
+                <span>:</span>
+                <input type="text" data-kop-field="schoolName" value="${escapeHtml(settings.schoolName || "MTs Ma'arif NU 1 Wangon")}" onchange="updateAnalisisField('schoolName', this.value)" class="kop-input font-bold w-52" title="Klik untuk edit Nama Sekolah">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Mata Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="mapel" value="${escapeHtml(settings.mapel || 'Informatika')}" onchange="updateAnalisisField('mapel', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Mata Pelajaran">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">KKM / KKTP</span>
+                <span>:</span>
+                <input type="number" data-kop-field="kktp" min="50" max="100" value="${kkm}" onchange="updateAnalisisField('kktp', Number(this.value))" class="kop-input font-bold text-indigo-700 w-20" title="Klik untuk edit KKM">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-24 shrink-0 font-medium">Kelas / Smt</span>
+                <span>:</span>
+                <span class="font-bold text-slate-900 px-1">${kelas === 'ALL' ? 'Semua Kelas (9A–9K)' : 'Kelas ' + kelas} / </span>
+                <input type="text" data-kop-field="semester" value="${escapeHtml(settings.semester || 'Gasal')}" onchange="updateAnalisisField('semester', this.value)" class="kop-input font-bold w-20" title="Klik untuk edit Semester">
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Hari / Tgl Ujian</span>
+                <span>:</span>
+                <input type="text" data-kop-field="hariUjian" value="${escapeHtml(settings.hariUjian || 'Senin')}" onchange="updateAnalisisField('hariUjian', this.value)" class="kop-input font-bold w-20 text-center" title="Klik untuk edit Hari">
+                <span>/</span>
+                <input type="text" data-kop-field="tanggalUjian" value="${escapeHtml(settings.tanggalUjian || '24 November 2026')}" onchange="updateAnalisisField('tanggalUjian', this.value)" class="kop-input font-bold w-40" title="Klik untuk edit Tanggal Pelaksanaan">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jenis Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">Pilihan Ganda, PGK & Esai</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Jumlah Soal</span>
+                <span>:</span>
+                <span class="font-bold text-slate-800 px-1">45 butir</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-32 shrink-0 font-medium">Tahun Pelajaran</span>
+                <span>:</span>
+                <input type="text" data-kop-field="tahunPelajaran" value="${escapeHtml(settings.tahunPelajaran || '2025/2026')}" onchange="updateAnalisisField('tahunPelajaran', this.value)" class="kop-input font-bold w-28" title="Klik untuk edit Tahun Pelajaran">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Peserta Remedial -->
+          <div class="border border-slate-300 rounded-xl overflow-hidden">
+            <table class="w-full text-xs border-collapse">
+              <thead class="bg-rose-50/70 text-slate-800 font-extrabold border-b border-slate-300">
+                <tr>
+                  <th class="py-2.5 px-3 border-r border-slate-300 text-center w-12">No</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-left">Nama Peserta</th>
+                  <th class="py-2.5 px-3 border-r border-slate-300 text-center w-14">L/P</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-center w-28">Jumlah Skor</th>
+                  <th class="py-2.5 px-4 border-r border-slate-300 text-center w-28">Nilai</th>
+                  <th class="py-2.5 px-5 text-left">Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${remedialList.length === 0 ? `
+                  <tr>
+                    <td colspan="6" class="py-8 text-center text-emerald-700 bg-emerald-50/30 font-semibold space-y-1">
+                      <p class="text-sm font-extrabold">✓ Alhamdulillah, Seluruh Peserta Mencapai Ketuntasan!</p>
+                      <p class="text-xs text-slate-500">Tidak ada siswa dengan nilai di bawah KKM (${kkm}) pada kelas ini.</p>
+                    </td>
+                  </tr>
+                ` : remedialList.map((r, idx) => `
+                  <tr class="border-b border-slate-200 hover:bg-rose-50/20">
+                    <td class="py-2.5 px-3 text-center text-slate-600 font-medium border-r border-slate-200">${idx + 1}</td>
+                    <td class="py-2.5 px-4 text-slate-900 font-semibold border-r border-slate-200">${escapeHtml(r.st.name)}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-700 font-bold border-r border-slate-200">${r.st.gender || 'L'}</td>
+                    <td class="py-2.5 px-4 text-center font-bold text-slate-800 border-r border-slate-200">${r.score}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-rose-700 border-r border-slate-200">${r.score}</td>
+                    <td class="py-2.5 px-5 text-slate-700 font-medium leading-relaxed">${escapeHtml(r.keterangan)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Format Tanda Tangan Resmi Pengesahan Analisis (Untuk Cetak / Dokumen Resmi) -->
+          <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between text-xs text-slate-800 px-6">
+            <div class="text-center space-y-1">
+              <p>Mengetahui,</p>
+              <p class="font-bold">Kepala Madrasah</p>
+              <div class="h-16"></div>
+              <p class="font-bold underline text-slate-900">${escapeHtml(settings.principalName || 'H. Sudir, S.Ag., M.S.I.')}</p>
+              <p class="text-slate-600 font-medium">NIP. ${escapeHtml(settings.principalNip || '197104122005011003')}</p>
+            </div>
+            <div class="text-center space-y-1">
+              <p>${escapeHtml(settings.schoolCity || 'Banyumas')}, ${escapeHtml(settings.tanggalKoreksi || '25 November 2026')}</p>
+              <p class="font-bold">Guru Mata Pelajaran</p>
+              <div class="h-16"></div>
+              <p class="font-bold underline text-slate-900">${escapeHtml(settings.teacherName || 'Fitrianto Puji Pangarso, S.Kom')}</p>
+              <p class="text-slate-600 font-medium">NIP. ${escapeHtml(settings.teacherNip || '-')}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * MODAL EDIT DATA PROFIL & KOP DOKUMEN ANALISIS
+     *************************************************************************/
+    function openEditProfilAnalisisModal() {
+      const s = appSettings;
+      openModal(`
+        <div class="p-6 space-y-4 max-w-xl mx-auto">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="text-lg font-black text-slate-900">Edit Profil & Kop Dokumen Analisis</h3>
+              <p class="text-xs text-slate-500">Data otomatis terisi pada seluruh 7 lembar analisis evaluasi asesmen</p>
+            </div>
+            <button onclick="closeModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">✕</button>
+          </div>
+
+          <form onsubmit="saveEditProfilAnalisis(event)" class="space-y-3.5 text-xs max-h-[70vh] overflow-y-auto pr-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Nama Guru</label>
+                <input type="text" id="prof-teacher-name" required value="${escapeHtml(s.teacherName || 'Fitrianto Puji Pangarso, S.Kom')}" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">NIP Guru</label>
+                <input type="text" id="prof-teacher-nip" value="${escapeHtml(s.teacherNip || '-')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran</label>
+                <input type="text" id="prof-mapel" required value="${escapeHtml(s.mapel || 'Informatika')}" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">KKM / KKTP</label>
+                <input type="number" id="prof-kkm" required min="50" max="100" value="${s.kktp || 75}" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-3 space-y-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Nama Sekolah</label>
+                <input type="text" id="prof-school-name" required value="${escapeHtml(s.schoolName || "MTs Ma'arif NU 1 Wangon")}" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Kota / Kabupaten</label>
+                  <input type="text" id="prof-school-city" value="${escapeHtml(s.schoolCity || 'Banyumas')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Provinsi</label>
+                  <input type="text" id="prof-school-province" value="${escapeHtml(s.schoolProvince || 'Jawa Tengah')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Nama Kepala Madrasah</label>
+                  <input type="text" id="prof-principal-name" value="${escapeHtml(s.principalName || 'H. Sudir, S.Ag., M.S.I.')}" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">NIP Kepala Madrasah</label>
+                  <input type="text" id="prof-principal-nip" value="${escapeHtml(s.principalNip || '197104122005011003')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-3 space-y-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Judul Ujian / Asesmen</label>
+                <input type="text" id="prof-exam-title" value="${escapeHtml(s.examTitle || 'PENILAIAN AKHIR SEMESTER GASAL')}" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Semester</label>
+                  <input type="text" id="prof-semester" value="${escapeHtml(s.semester || 'Gasal')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Tahun Pelajaran</label>
+                  <input type="text" id="prof-tahun" value="${escapeHtml(s.tahunPelajaran || '2025/2026')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Hari Pelaksanaan</label>
+                  <input type="text" id="prof-hari" value="${escapeHtml(s.hariUjian || 'Senin')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Tanggal Pelaksanaan</label>
+                  <input type="text" id="prof-tgl-ujian" value="${escapeHtml(s.tanggalUjian || '24 November 2026')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Tanggal Koreksi</label>
+                  <input type="text" id="prof-tgl-koreksi" value="${escapeHtml(s.tanggalKoreksi || '25 November 2026')}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-3 border-t border-slate-100">
+              <button type="button" onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">Batal</button>
+              <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition shadow-xs">Simpan Perubahan Profil</button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function saveEditProfilAnalisis(e) {
+      e.preventDefault();
+      appSettings.teacherName = document.getElementById('prof-teacher-name').value.trim();
+      appSettings.teacherNip = document.getElementById('prof-teacher-nip').value.trim();
+      appSettings.mapel = document.getElementById('prof-mapel').value.trim();
+      appSettings.kktp = Number(document.getElementById('prof-kkm').value) || 75;
+      appSettings.kkm = appSettings.kktp;
+      appSettings.schoolName = document.getElementById('prof-school-name').value.trim();
+      appSettings.schoolCity = document.getElementById('prof-school-city').value.trim();
+      appSettings.schoolProvince = document.getElementById('prof-school-province').value.trim();
+      appSettings.principalName = document.getElementById('prof-principal-name').value.trim();
+      appSettings.principalNip = document.getElementById('prof-principal-nip').value.trim();
+      appSettings.examTitle = document.getElementById('prof-exam-title').value.trim();
+      appSettings.semester = document.getElementById('prof-semester').value.trim();
+      appSettings.tahunPelajaran = document.getElementById('prof-tahun').value.trim();
+      appSettings.hariUjian = document.getElementById('prof-hari').value.trim();
+      appSettings.tanggalUjian = document.getElementById('prof-tgl-ujian').value.trim();
+      appSettings.tanggalKoreksi = document.getElementById('prof-tgl-koreksi').value.trim();
+
+      saveState();
+      closeModal();
+      renderAnalisisKhususLengkap(document.getElementById('main-view'));
+      showToast('✓ Profil dan kop dokumen analisis berhasil diperbarui!', 'success');
+    }
+
+    function printAnalisisKhusus() {
+      window.print();
+    }
+
+    function exportAnalisisKhususExcel() {
+      const activeKelas = appState.analisisKhususKelasFilter || '9A';
+      const container = document.getElementById('analisis-khusus-print-area');
+      if (!container) return;
+
+      const htmlContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+          <style>
+            table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11px; margin-bottom: 20px; }
+            th, td { border: 1px solid #94a3b8; padding: 4px 6px; text-align: left; }
+            th { background-color: #f1f5f9; font-weight: bold; }
+            .bg-orange { background-color: #f97316; color: white; font-weight: bold; text-align: center; }
+            .bg-blue { background-color: #3b82f6; color: white; font-weight: bold; text-align: center; }
+            .bg-green { background-color: #22c55e; color: white; font-weight: bold; text-align: center; }
+            .bg-yellow { background-color: #f59e0b; color: white; font-weight: bold; text-align: center; }
+          </style>
+        </head>
+        <body>
+          ${container.innerHTML}
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Analisis_Asesmen_Informatika_${activeKelas}_${Date.now()}.xls`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('File Excel analisis berhasil diunduh!');
+    }
+
+
     function hashStringToSeed(str) {
       let h = 2166136261 >>> 0;
       for (let i = 0; i < str.length; i++) {
